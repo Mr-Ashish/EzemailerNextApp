@@ -1,10 +1,16 @@
 'use server';
 import { z } from 'zod';
-import { createInvoice, deleteInvoice, updateInvoice } from './data';
+import {
+  createInvoice,
+  createUser,
+  deleteInvoice,
+  updateInvoice,
+} from './data';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import bcrypt from 'bcrypt';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -85,6 +91,7 @@ export async function authenticateAction(
 ) {
   try {
     await signIn('credentials', formData);
+    redirect('/dashboard');
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -97,3 +104,58 @@ export async function authenticateAction(
     throw error;
   }
 }
+
+export async function signUpAction(
+  name: string,
+  email: string,
+  password: string
+) {
+  try {
+    const schema = z.object({
+      name: z.string().min(6),
+      email: z.string().email(),
+      password: z.string().min(6),
+    });
+    const result = schema.safeParse({ name, email, password });
+
+    if (result.success) {
+      const { email, password } = result.data;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await createUser(name, email, hashedPassword);
+      await signIn('credentials', {
+        email,
+        password,
+        redirectTo: '/dashboard',
+      });
+    }
+    if (!result.success) {
+      console.log('Validation failed with the following errors:');
+      result.error.issues.forEach((issue) => {
+        console.log(`Path: ${issue.path.join('.')}, Issue: ${issue.message}`);
+      });
+      return null;
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+  }
+}
+
+// export async function createSubscriptionForUser({}) {
+//   try {
+//     const subscription = await prisma.subscription.create({
+//       data: {
+//         userId: user.id, // Link to the user
+//         moduleId: module.id, // Link to the module
+//         subscriptionType: 'FULL',
+//         price: 100.0,
+//         durationInMonths: 12,
+//         startDate: new Date(),
+//         endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+//       },
+//     });
+//   } catch (error) {
+//     console.error('Subscription error:', error);
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }

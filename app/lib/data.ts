@@ -316,3 +316,23 @@ export async function deleteInvoice(id: string) {
     await prisma.$disconnect();
   }
 }
+
+export async function createUser(
+  name: string,
+  email: string,
+  hashedPassword: string
+) {
+  try {
+    const user = await prisma.user.create({
+      data: {
+        name: name,
+        email: email,
+        password: hashedPassword,
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+}

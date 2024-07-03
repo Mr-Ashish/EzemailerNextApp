@@ -18,6 +18,8 @@ model User {
   name     String
   email    String @unique
   password String
+  createdAt     DateTime         @default(now())
+  subscriptions Subscription[]
 }
 
 model Invoice {
@@ -41,3 +43,33 @@ model Revenue {
   month   String @id
   revenue Int
 }
+
+model Module {
+  id            Int                  @id @default(autoincrement())
+  moduleName    String
+  description   String?
+  createdAt     DateTime             @default(now())
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id               Int             @id @default(autoincrement())
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String
+  module           Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId         Int
+  subscriptionType SubscriptionEnum
+  price            Float
+  durationInMonths Int
+  startDate        DateTime
+  endDate          DateTime
+  createdAt        DateTime        @default(now())
+}
+
+enum SubscriptionEnum {
+  FULL
+  REPEATED
+}
+
+
+
