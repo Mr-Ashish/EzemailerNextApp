@@ -125,15 +125,15 @@ export async function signUpAction(
       await signIn('credentials', {
         email,
         password,
-        redirectTo: '/dashboard',
       });
+      redirect('/dashboard');
     }
     if (!result.success) {
       console.log('Validation failed with the following errors:');
       result.error.issues.forEach((issue) => {
         console.log(`Path: ${issue.path.join('.')}, Issue: ${issue.message}`);
       });
-      return null;
+      throw new Error('Validation failed.');
     }
   } catch (error) {
     console.error('Signup error:', error);

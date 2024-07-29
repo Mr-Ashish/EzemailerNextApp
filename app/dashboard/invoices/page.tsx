@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { fetchInvoicesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
+// import PaymentButton from '@/components/ui/paymentButton';
 
 export const metadata: Metadata = {
   title: 'Invoices',
@@ -39,6 +40,7 @@ export default async function Page({
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>
+      {/* <PaymentButton amount={100} currency="INR" receipt="INV-1234" /> */}
     </div>
   );
 }
