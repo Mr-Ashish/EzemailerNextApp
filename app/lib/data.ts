@@ -336,3 +336,12 @@ export async function createUser(
     throw error;
   }
 }
+
+export function getAllHtmlTemplatesForUser(userId: string) {
+  try {
+    return prisma.$queryRaw`SELECT * FROM "EmailTemplates" WHERE "userId"=${userId}`;
+  } catch (error) {
+    console.error('Error getting templates:', error);
+    throw error;
+  }
+}

@@ -1,33 +1,35 @@
-import NextAuth from 'next-auth';
-import { authConfig } from './auth.config';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-const { auth } = NextAuth(authConfig);
+const authRoutes = ['/login', '/signup', '/error'];
 
-const authRoutes = ['/login', '/signup'];
-
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  const isLoggedIn = !!token;
   const isAuthRoute = authRoutes.includes(req.nextUrl.pathname);
-  const isApiAuthRouter = req.nextUrl.pathname.startsWith('/api/auth');
+  const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth');
+  // console.log('login', isLoggedIn, req);
 
-  if (isApiAuthRouter) {
-    return;
+  // Allow the auth routes and API auth routes to pass through
+  if (isApiAuthRoute) {
+    return NextResponse.next();
   }
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      return Response.redirect(new URL('/dashboard', req.nextUrl));
+      return NextResponse.redirect(new URL('/dashboard', req.url));
     }
-    return;
-  }
-  if (!isLoggedIn && !isAuthRoute) {
-    return Response.redirect(new URL('/login', req.nextUrl));
+    return NextResponse.next();
   }
 
-  return;
-});
+  if (!isLoggedIn && !isAuthRoute) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
   matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
 };

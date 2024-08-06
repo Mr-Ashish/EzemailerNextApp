@@ -74,7 +74,7 @@ export async function POST(req: any) {
   // });
 
   const transformedHtml = transformHtml(htmlContent);
-  console.log('transformedHtml', transformedHtml);
+  // console.log('transformedHtml', transformedHtml);
 
   return NextResponse.json({
     transformedHtml: transformedHtml.data,

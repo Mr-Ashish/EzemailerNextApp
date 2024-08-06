@@ -337,7 +337,7 @@ const transformHtml = (html: any) => {
     style: any,
     styleValue: any
   ) {
-    console.log('addToErrorMessages', messageObject, key, style, styleValue);
+    // console.log('addToErrorMessages', messageObject, key, style, styleValue);
     let message = '';
     if (styleValue) {
       message = `${style}: ${styleValue}`;

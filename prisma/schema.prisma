@@ -20,6 +20,7 @@ model User {
   password String
   createdAt     DateTime         @default(now())
   subscriptions Subscription[]
+  emailTemplates EmailTemplates[] 
 }
 
 model Invoice {
@@ -69,6 +70,17 @@ model Subscription {
 enum SubscriptionEnum {
   FULL
   REPEATED
+}
+
+model EmailTemplates {
+  id        Int      @id @default(autoincrement())
+  name      String
+  content   String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 

@@ -4,11 +4,12 @@ import {
   createInvoice,
   createUser,
   deleteInvoice,
+  getAllHtmlTemplatesForUser,
   updateInvoice,
 } from './data';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn } from '@/auth';
+import { signIn } from '@/auth.config';
 import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
 
@@ -159,3 +160,34 @@ export async function signUpAction(
 //     await prisma.$disconnect();
 //   }
 // }
+
+export async function insertHtmlTemplate(
+  name: string,
+  content: string,
+  description?: string
+) {
+  try {
+    const newTemplate = await prisma.htmlTemplate.create({
+      data: {
+        name,
+        content,
+        description,
+      },
+    });
+    return { success: true, template: newTemplate };
+  } catch (error) {
+    console.error('Failed to insert template:', error);
+    return { success: false, error: 'Failed to insert template' };
+  }
+}
+
+export async function getHtmlTemplates(userId: string) {
+  try {
+    const templates = await getAllHtmlTemplatesForUser(userId);
+    // console.log('Templates:', templates);
+    return { success: true, templates };
+  } catch (error) {
+    console.error('Failed to fetch templates:', error);
+    return { success: false, error: 'Failed to fetch templates' };
+  }
+}

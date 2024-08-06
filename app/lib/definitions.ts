@@ -86,3 +86,13 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type EmailTemplateType = {
+  id: string;
+  name: string;
+  content: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+};
