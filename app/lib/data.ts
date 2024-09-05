@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import {
   CustomerField,
   CustomersTableType,
@@ -343,5 +344,49 @@ export function getAllHtmlTemplatesForUser(userId: string) {
   } catch (error) {
     console.error('Error getting templates:', error);
     throw error;
+  }
+}
+
+export async function insertHtmlTemplate(
+  userId: string,
+  name: string,
+  content: string,
+  description?: string
+) {
+  try {
+    const newTemplate = await prisma.emailTemplates.create({
+      data: {
+        name,
+        content,
+        description,
+        userId,
+        externalId: randomUUID(),
+      },
+    });
+    return { success: true, template: newTemplate };
+  } catch (error) {
+    console.error('Failed to insert template:', error);
+    return { success: false, error: 'Failed to insert template' };
+  }
+}
+
+export async function updateTemplateContent(
+  templateExternalId: string,
+  newContent: string
+) {
+  try {
+    const updatedTemplate = await prisma.emailTemplates.update({
+      where: {
+        externalId: templateExternalId,
+      },
+      data: {
+        content: newContent,
+      },
+    });
+
+    return { success: true, template: updatedTemplate };
+  } catch (error) {
+    console.error('Error updating template content:', error);
+    return { success: false, error: 'Failed to update template content.' };
   }
 }

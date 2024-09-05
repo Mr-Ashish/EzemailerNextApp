@@ -1,17 +1,20 @@
 'use client';
+
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-const FileUpload = ({
-  onUploadSuccess,
-}: {
+interface FileUploadProps {
   onUploadSuccess: (data: any) => void;
-}) => {
-  const [file, setFile] = useState(null);
+}
 
-  const handleFileChange = (e: any) => {
-    setFile(e.target.files[0]);
+const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    setFile(selectedFile);
   };
 
   const handleUpload = async () => {
@@ -33,9 +36,15 @@ const FileUpload = ({
   };
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
-      <Button onClick={handleUpload}>Upload</Button>
+    <div className="mx-auto flex w-full max-w-xs flex-col items-center space-y-4">
+      <Input
+        type="file"
+        onChange={handleFileChange}
+        className="file-input cursor-pointer"
+      />
+      <Button onClick={handleUpload} disabled={!file} className="w-full">
+        Upload
+      </Button>
     </div>
   );
 };

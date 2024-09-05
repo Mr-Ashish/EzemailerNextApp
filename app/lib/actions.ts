@@ -5,13 +5,16 @@ import {
   createUser,
   deleteInvoice,
   getAllHtmlTemplatesForUser,
+  insertHtmlTemplate,
   updateInvoice,
+  updateTemplateContent,
 } from './data';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth.config';
 import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
+import { use } from 'react';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -161,26 +164,6 @@ export async function signUpAction(
 //   }
 // }
 
-export async function insertHtmlTemplate(
-  name: string,
-  content: string,
-  description?: string
-) {
-  try {
-    const newTemplate = await prisma.htmlTemplate.create({
-      data: {
-        name,
-        content,
-        description,
-      },
-    });
-    return { success: true, template: newTemplate };
-  } catch (error) {
-    console.error('Failed to insert template:', error);
-    return { success: false, error: 'Failed to insert template' };
-  }
-}
-
 export async function getHtmlTemplates(userId: string) {
   try {
     const templates = await getAllHtmlTemplatesForUser(userId);
@@ -191,3 +174,32 @@ export async function getHtmlTemplates(userId: string) {
     return { success: false, error: 'Failed to fetch templates' };
   }
 }
+
+export async function createHtmlTemplateAction(
+  name: string,
+  description: string,
+  content: string
+) {
+  try {
+    const result = await insertHtmlTemplate(name, content, description);
+    console.log('Result:', result.template);
+    if (result.success) {
+      return { success: true, template: result.template };
+    }
+    return { success: false, error: 'Failed to create template' };
+  } catch (error) {
+    console.error('Failed to create template:', error);
+    return { success: false, error: 'Failed to create template' };
+  }
+}
+
+const updateTemplateAction = async (templateId: string, newContent: string) => {
+  const result = await updateTemplateContent(templateId, newContent);
+
+  if (result.success) {
+    // Optionally, update your state or provide user feedback
+    console.log('Template updated successfully:', result.template);
+  } else {
+    console.error('Failed to update template:', result.error);
+  }
+};
