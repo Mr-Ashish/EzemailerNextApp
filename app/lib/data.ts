@@ -340,7 +340,7 @@ export async function createUser(
 
 export function getAllHtmlTemplatesForUser(userId: string) {
   try {
-    return prisma.$queryRaw`SELECT * FROM "EmailTemplates" WHERE "userId"=${userId}`;
+    return prisma.$queryRaw`SELECT * FROM "EmailTemplates" WHERE "userId"=${userId} and active=true`;
   } catch (error) {
     console.error('Error getting templates:', error);
     throw error;
@@ -383,10 +383,27 @@ export async function updateTemplateContent(
         content: newContent,
       },
     });
-
+    console.log('Updated template:', updatedTemplate);
     return { success: true, template: updatedTemplate };
   } catch (error) {
     console.error('Error updating template content:', error);
     return { success: false, error: 'Failed to update template content.' };
+  }
+}
+
+export async function deleteHtmlTemplate(templateId: string) {
+  try {
+    const deletedTemplate = await prisma.emailTemplates.update({
+      where: {
+        externalId: templateId,
+      },
+      data: {
+        active: false,
+      },
+    });
+    return { success: true, template: deletedTemplate };
+  } catch (error) {
+    console.error('Error deleting template:', error);
+    return { success: false, error: 'Failed to delete template.' };
   }
 }

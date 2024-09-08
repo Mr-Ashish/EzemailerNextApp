@@ -1,16 +1,18 @@
 'use client';
-import { updateTemplateContent } from '@/app/lib/data';
+
 import FileUpload from '@/components/ui/Validator/FileUpload';
-import HtmlCodePreviewer from '@/components/ui/Validator/HtmlCodePreviewer';
 import PreviewComponent from '@/components/ui/Validator/PreviewComponent';
-import TransformAndPreview from '@/components/ui/Validator/TransformAndPreview';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button'; // Importing Shadcn Button component
+import { ArrowLeft } from 'lucide-react'; // Importing back arrow icon from lucide-react
+import { updateTemplateAction } from '@/app/lib/actions';
 
 export default function EmailValidator() {
   const [sanitizedData, setSanitizedData] = useState(null);
   const [content, setContent] = useState(null);
   const pathname = usePathname();
+  const router = useRouter();
   const [templateId, setTemplateId] = useState<string | null>(null);
 
   // Extract the ID from the pathname
@@ -20,27 +22,48 @@ export default function EmailValidator() {
     setTemplateId(id);
   }, [pathname]);
 
-  const handleUpdateTemplate = async () => {
+  const handleUpdateTemplate = async (content: string) => {
+    console.log('----here updating template', templateId, content);
     if (!templateId || !content) return;
-    await updateTemplateContent(templateId, content);
-    // Add any additional logic, such as navigating away or displaying a success message
+
+    const result = await updateTemplateAction(templateId, content); // Calls server action
+    if (result.success) {
+      console.log('Template updated successfully:', result.template);
+    } else {
+      console.error('Failed to update template:', result.error);
+    }
   };
 
-  //   useEffect(() => {
-  //     console.log('---here', sanitizedHtml);
-  //   }, [sanitizedHtml]);
+  useEffect(() => {
+    console.log('----here sanitizedData', sanitizedData, templateId);
+    if (!sanitizedData || !templateId) return;
+    handleUpdateTemplate(JSON.stringify(sanitizedData));
+  }, [sanitizedData, templateId]);
+
+  const handleFileUploadSuccess = (data: any) => {
+    console.log('----here data', data);
+    setSanitizedData(data);
+  };
 
   return (
     <div>
+      <Button
+        onClick={() => router.push('/dashboard/validator')}
+        variant="outline" // You can change the variant as needed
+        className="mb-4 flex items-center"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" /> {/* Back icon */}
+        Back
+      </Button>
       <h1>Email HTML Preview Tool</h1>
-      <FileUpload onUploadSuccess={(data) => setSanitizedData(data)} />
+      {/* Back button using Shadcn Button component with back icon */}
+
+      <FileUpload onUploadSuccess={handleFileUploadSuccess} />
       {sanitizedData && (
         <>
           <PreviewComponent htmlContent={sanitizedData.sanitizedOriginal} />
-
           <PreviewComponent htmlContent={sanitizedData.transformedHtml} />
           <div>{JSON.stringify(sanitizedData.errors)}</div>
-          {/* <TransformAndPreview sanitizedHtml={sanitizedHtml} /> */}
         </>
       )}
     </div>

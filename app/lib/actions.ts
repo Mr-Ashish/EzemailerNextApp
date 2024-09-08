@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   createInvoice,
   createUser,
+  deleteHtmlTemplate,
   deleteInvoice,
   getAllHtmlTemplatesForUser,
   insertHtmlTemplate,
@@ -193,13 +194,30 @@ export async function createHtmlTemplateAction(
   }
 }
 
-const updateTemplateAction = async (templateId: string, newContent: string) => {
-  const result = await updateTemplateContent(templateId, newContent);
+export async function updateTemplateAction(
+  templateId: string,
+  newContent: string
+) {
+  try {
+    const result = await updateTemplateContent(templateId, newContent);
+    console.log('Result:', result.template);
+    if (result.success) {
+      return { success: true, template: result.template };
+    }
+    return { success: false, error: 'Failed to create template' };
+  } catch (error) {
+    console.error('Failed to create template:', error);
+    return { success: false, error: 'Failed to create template' };
+  }
+}
 
+export const deleteTemplateAction = async (templateId: string) => {
+  const result = await deleteHtmlTemplate(templateId);
   if (result.success) {
     // Optionally, update your state or provide user feedback
-    console.log('Template updated successfully:', result.template);
+    console.log('Template deleted successfully:', result.template);
+    return { success: true };
   } else {
-    console.error('Failed to update template:', result.error);
+    console.error('Failed to delete template:', result.error);
   }
 };

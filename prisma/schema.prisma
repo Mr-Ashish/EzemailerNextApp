@@ -82,6 +82,7 @@ model EmailTemplates {
   userId    String   
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   externalId String   @default(uuid()) @unique
+  active      Boolean  @default(true) 
 }
 
 
