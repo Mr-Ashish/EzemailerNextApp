@@ -6,14 +6,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button'; // Importing Shadcn Button component
 import { ArrowLeft } from 'lucide-react'; // Importing back arrow icon from lucide-react
-import { updateTemplateAction } from '@/app/lib/actions';
+import { getTemplateByIdAction, updateTemplateAction } from '@/app/lib/actions'; // Import server actions
 
 export default function EmailValidator() {
   const [sanitizedData, setSanitizedData] = useState(null);
-  const [content, setContent] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
   const [templateId, setTemplateId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Loading state to handle the template loading
 
   // Extract the ID from the pathname
   useEffect(() => {
@@ -21,6 +21,29 @@ export default function EmailValidator() {
     const id = parts?.[3] || null; // Assuming the id is at this position
     setTemplateId(id);
   }, [pathname]);
+
+  // Fetch the template data if templateId is present
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      if (templateId) {
+        try {
+          const result = await getTemplateByIdAction(templateId); // Call the server-side action to get the template
+          if (result.success && result.template) {
+            console.log('Template fetched:', result.template);
+            setSanitizedData(JSON.parse(result.template.content)); // Assuming the content is in JSON format
+          }
+        } catch (error) {
+          console.error('Failed to fetch template:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchTemplate();
+  }, [templateId]);
 
   const handleUpdateTemplate = async (content: string) => {
     console.log('----here updating template', templateId, content);
@@ -45,6 +68,10 @@ export default function EmailValidator() {
     setSanitizedData(data);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
       <Button
@@ -56,16 +83,23 @@ export default function EmailValidator() {
         Back
       </Button>
       <h1>Email HTML Preview Tool</h1>
-      {/* Back button using Shadcn Button component with back icon */}
 
-      <FileUpload onUploadSuccess={handleFileUploadSuccess} />
       {sanitizedData && (
-        <>
-          <PreviewComponent htmlContent={sanitizedData.sanitizedOriginal} />
-          <PreviewComponent htmlContent={sanitizedData.transformedHtml} />
-          <div>{JSON.stringify(sanitizedData.errors)}</div>
-        </>
+        <div className="flex flex-row">
+          <div className="w-1/2">
+            <PreviewComponent htmlContent={sanitizedData.sanitizedOriginal} />
+          </div>
+          <div className="w-1/2">
+            <PreviewComponent htmlContent={sanitizedData.transformedHtml} />
+          </div>
+          {/* <div>{JSON.stringify(sanitizedData.errors)}</div> */}
+        </div>
       )}
+      <div className="mt-4">Input/Upload your HTML file to preview</div>
+      <FileUpload
+        onUploadSuccess={handleFileUploadSuccess}
+        isEditView={!!sanitizedData}
+      />
     </div>
   );
 }

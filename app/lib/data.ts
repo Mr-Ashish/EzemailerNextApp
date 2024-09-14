@@ -11,6 +11,7 @@ import {
 import { formatCurrency } from './utils';
 import { PrismaClient } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
+import { auth } from '@/auth.config';
 
 const prisma = new PrismaClient();
 
@@ -347,19 +348,19 @@ export function getAllHtmlTemplatesForUser(userId: string) {
   }
 }
 
-export async function insertHtmlTemplate(
-  userId: string,
-  name: string,
-  content: string,
-  description?: string
-) {
+export async function insertHtmlTemplate(name: string, description?: string) {
   try {
+    const session = await auth();
+    const currentSignedInUser = session.userId;
+    console.log('Current user:', session);
+    if (!currentSignedInUser) {
+      return { success: false, error: 'User not found' };
+    }
     const newTemplate = await prisma.emailTemplates.create({
       data: {
         name,
-        content,
         description,
-        userId,
+        userId: currentSignedInUser,
         externalId: randomUUID(),
       },
     });
@@ -405,5 +406,22 @@ export async function deleteHtmlTemplate(templateId: string) {
   } catch (error) {
     console.error('Error deleting template:', error);
     return { success: false, error: 'Failed to delete template.' };
+  }
+}
+
+export async function getHtmlTemplateById(templateId: string) {
+  try {
+    const template = await prisma.emailTemplates.findUnique({
+      where: { externalId: templateId },
+    });
+
+    if (template) {
+      return { success: true, template };
+    } else {
+      return { success: false, error: 'Template not found' };
+    }
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    return { success: false, error: 'Failed to fetch template' };
   }
 }

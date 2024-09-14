@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -73,17 +70,15 @@ enum SubscriptionEnum {
 }
 
 model EmailTemplates {
-  id        Int      @id @default(autoincrement())
-  name      String
-  content   String
+  id          Int      @id @default(autoincrement())
+  name        String
+  content     String?  // Made nullable
   description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String   
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  externalId String   @default(uuid()) @unique
+  version     Int      @default(1)  // New version attribute
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String   
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  externalId  String   @default(uuid()) @unique
   active      Boolean  @default(true) 
 }
-
-
-

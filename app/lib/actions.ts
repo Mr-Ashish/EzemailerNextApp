@@ -6,6 +6,7 @@ import {
   deleteHtmlTemplate,
   deleteInvoice,
   getAllHtmlTemplatesForUser,
+  getHtmlTemplateById,
   insertHtmlTemplate,
   updateInvoice,
   updateTemplateContent,
@@ -182,7 +183,7 @@ export async function createHtmlTemplateAction(
   content: string
 ) {
   try {
-    const result = await insertHtmlTemplate(name, content, description);
+    const result = await insertHtmlTemplate(name, description, content);
     console.log('Result:', result.template);
     if (result.success) {
       return { success: true, template: result.template };
@@ -219,5 +220,16 @@ export const deleteTemplateAction = async (templateId: string) => {
     return { success: true };
   } else {
     console.error('Failed to delete template:', result.error);
+  }
+};
+
+export const getTemplateByIdAction = async (templateId: string) => {
+  const result = await getHtmlTemplateById(templateId);
+  if (result.success) {
+    console.log('Template fetched:', result.template);
+    return { success: true, template: result.template };
+  } else {
+    console.error('Failed to fetch template:', result.error);
+    return { success: false, error: 'Failed to fetch template' };
   }
 };
