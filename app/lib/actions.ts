@@ -179,11 +179,10 @@ export async function getHtmlTemplates(userId: string) {
 
 export async function createHtmlTemplateAction(
   name: string,
-  description: string,
-  content: string
+  description: string
 ) {
   try {
-    const result = await insertHtmlTemplate(name, description, content);
+    const result = await insertHtmlTemplate(name, description);
     console.log('Result:', result.template);
     if (result.success) {
       return { success: true, template: result.template };
