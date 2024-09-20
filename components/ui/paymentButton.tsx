@@ -1,4 +1,6 @@
 'use client';
+import { Button } from '@/components/ui/button'; // ShadCN button component
+import { CreditCard, Loader } from 'lucide-react';
 import { useState } from 'react';
 
 const PaymentButton = ({ amount }: { amount: number }) => {
@@ -76,9 +78,23 @@ const PaymentButton = ({ amount }: { amount: number }) => {
   };
 
   return (
-    <button onClick={handlePayment} disabled={isLoading}>
-      {isLoading ? 'Processing...' : 'Pay Now'}
-    </button>
+    <Button
+      onClick={handlePayment}
+      disabled={isLoading}
+      className="flex items-center justify-center"
+    >
+      {isLoading ? (
+        <>
+          <Loader className="mr-2 animate-spin" />
+          Processing...
+        </>
+      ) : (
+        <>
+          <CreditCard className="mr-2" />
+          Subscribe and Pay Now
+        </>
+      )}
+    </Button>
   );
 };
 
