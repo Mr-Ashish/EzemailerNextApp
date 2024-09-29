@@ -2,28 +2,15 @@ import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/nav-links';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
-import { signOut } from '@/auth.config';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { getUserSubscriptionsAction } from '@/app/lib/actions';
-import { useState, useEffect } from 'react';
+import { signOutAction } from '@/app/lib/actions';
 
 export default function SideNav() {
-  const [subscription, setSubscription] = useState(null);
-  const fetchSubscriptionIfAny = async () => {
-    const userSubscriptions = await getUserSubscriptionsAction();
-    if (userSubscriptions.success) {
-      setSubscription(userSubscriptions.subscription);
-    }
-  };
-
-  useEffect(() => {
-    fetchSubscriptionIfAny();
-  }, []);
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
       <Link
@@ -38,12 +25,7 @@ export default function SideNav() {
         <TooltipProvider delayDuration={100}>
           <Tooltip>
             <TooltipTrigger>
-              <form
-                action={async () => {
-                  'use server';
-                  await signOut({ redirectTo: '/login' });
-                }}
-              >
+              <form action={signOutAction}>
                 <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
                   <PowerIcon className="w-6" />
                   <div className="hidden md:block"></div>

@@ -1,14 +1,11 @@
 'use client';
 import { CheckCircle, Clock } from 'lucide-react'; // Icons for feature status
 import PaymentButton from '@/components/ui/paymentButton';
-import { useEffect, useState } from 'react';
-import { getUserSubscriptionsAction } from '@/app/lib/actions';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
+import { useSubscription } from '../layout';
 
 export default function Dashboard() {
-  const [subscription, setSubscription] = useState(null);
-
   // Plans available in the tool
   const plans = [
     {
@@ -84,17 +81,12 @@ export default function Dashboard() {
       icon: <Clock className="text-yellow-500" />,
     },
   ];
-
-  const fetchSubscriptionIfAny = async () => {
-    const userSubscriptions = await getUserSubscriptionsAction();
-    if (userSubscriptions.success) {
-      setSubscription(userSubscriptions.subscription);
-    }
+  const subscription = useSubscription();
+  const handlePaymentSuccess = () => {
+    // reload the website to fetch the subscription
+    console.log('----- here reloading to get latest subscription');
+    window.location.reload();
   };
-
-  useEffect(() => {
-    fetchSubscriptionIfAny();
-  }, []);
 
   return (
     <div className="flex min-h-screen">
@@ -131,7 +123,7 @@ export default function Dashboard() {
                   <PaymentButton
                     amount={plan.amount}
                     plan={plan}
-                    callBack={fetchSubscriptionIfAny}
+                    callBack={handlePaymentSuccess}
                   />
                 </div>
               ))}

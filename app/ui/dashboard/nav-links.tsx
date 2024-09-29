@@ -14,31 +14,36 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useSubscription } from '@/app/dashboard/layout';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
-const links = [
-  { name: 'Home', href: '/dashboard', icon: HomeIcon },
-  // {
-  //   name: 'Invoices',
-  //   href: '/dashboard/invoices',
-  //   icon: DocumentDuplicateIcon,
-  // },
-  // { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
-  {
-    name: 'Template Validator',
-    href: '/dashboard/validator',
-    icon: DocumentDuplicateIcon,
-  },
-];
 
 export default function NavLinks() {
   const pathname = usePathname();
+  const subscription = useSubscription();
+
+  const links = [
+    { name: 'Home', href: '/dashboard', icon: HomeIcon, isValid: true },
+    // {
+    //   name: 'Invoices',
+    //   href: '/dashboard/invoices',
+    //   icon: DocumentDuplicateIcon,
+    // },
+    // { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+    {
+      name: 'Template Validator',
+      href: '/dashboard/validator',
+      icon: DocumentDuplicateIcon,
+      isValid: !!subscription?.length,
+    },
+  ];
 
   return (
     <>
       {links.map((link) => {
         const LinkIcon = link.icon;
+        if (!link.isValid) return null;
         return (
           <TooltipProvider key={link.name} delayDuration={100}>
             <Tooltip>

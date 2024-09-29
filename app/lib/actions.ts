@@ -14,7 +14,7 @@ import {
 } from './data';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn } from '@/auth.config';
+import { signIn, signOut } from '@/auth.config';
 import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
 
@@ -125,24 +125,32 @@ export async function signUpAction(
     const result = schema.safeParse({ name, email, password });
 
     if (result.success) {
+      console.log('----here signupin process', result);
       const { email, password } = result.data;
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await createUser(name, email, hashedPassword);
-      await signIn('credentials', {
+      const signInResult = await signIn('credentials', {
         email,
         password,
+        redirect: false,
       });
-      redirect('/dashboard');
+      console.log('----here', signInResult);
+      if (!signInResult?.error) {
+        return { success: true };
+      } else {
+        throw new Error(`Sign-in failed.${signInResult?.error}`);
+      }
     }
     if (!result.success) {
       console.log('Validation failed with the following errors:');
       result.error.issues.forEach((issue) => {
         console.log(`Path: ${issue.path.join('.')}, Issue: ${issue.message}`);
       });
-      throw new Error('Validation failed.');
+      return { success: false, error: result.error.issues };
     }
   } catch (error) {
     console.error('Signup error:', error);
+    return { success: false };
   }
 }
 
@@ -241,4 +249,9 @@ export async function getUserSubscriptionsAction() {
     console.error('Failed to fetch subscriptions:', error);
     return { success: false, error: 'No subscripts available' };
   }
+}
+
+export async function signOutAction() {
+  await signOut({ redirectTo: '/login' });
+  redirect('/login');
 }
