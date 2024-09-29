@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'; // ShadCN button component
 import { CreditCard, Loader } from 'lucide-react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useSession } from 'next-auth/react';
 
 const PaymentButton = ({
   amount,
@@ -11,10 +12,10 @@ const PaymentButton = ({
 }: {
   amount: number;
   plan: any;
-  callback: () => {};
+  callback?: () => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const { data: session } = useSession();
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
@@ -78,16 +79,17 @@ const PaymentButton = ({
         });
 
         const payment = await captureResponse.json();
+        // console.log('---here', payment);
         // alert(`Payment successful: ${payment.status}`);
         setIsLoading(false);
-        if (payment.status === 'captured') {
+        if (payment.status === 'captured' && callback) {
           callback();
         }
       },
       prefill: {
-        name: 'Your Name',
-        email: 'email@example.com',
-        contact: '9999999999',
+        name: session?.user?.name,
+        email: session?.user?.email,
+        contact: '+91111111111',
       },
       theme: {
         color: '#3399cc',

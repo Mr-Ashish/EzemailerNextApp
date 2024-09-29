@@ -123,7 +123,7 @@ export default function Dashboard() {
                   <PaymentButton
                     amount={plan.amount}
                     plan={plan}
-                    callBack={handlePaymentSuccess}
+                    callback={handlePaymentSuccess}
                   />
                 </div>
               ))}

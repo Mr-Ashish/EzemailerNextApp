@@ -4,6 +4,7 @@ const {
   invoices,
   customers,
   revenue,
+  modules,
 } = require('../app/lib/placeholder-data.js');
 const bcrypt = require('bcrypt');
 
@@ -70,12 +71,30 @@ async function seedRevenue() {
   }
 }
 
+async function seedModules() {
+  for (const module of modules) {
+    await prisma.module.upsert({
+      where: { moduleName: module.moduleName, id: module.id },
+      update: {
+        description: module.description,
+        createdAt: new Date(),
+      },
+      create: {
+        moduleName: module.moduleName,
+        description: module.description,
+        createdAt: new Date(),
+      },
+    });
+  }
+}
+
 async function main() {
   await prisma.$connect();
-  await seedCustomers();
-  await seedUsers();
-  await seedInvoices();
-  await seedRevenue();
+  // await seedCustomers();
+  // await seedUsers();
+  // await seedInvoices();
+  // await seedRevenue();
+  await seedModules();
   await prisma.$disconnect();
 }
 

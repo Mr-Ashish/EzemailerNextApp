@@ -27,21 +27,21 @@ const savePaymentAndSubscription = async (
 export async function POST(request: any) {
   const { paymentId, amount, plan } = await request.json();
   try {
-    const paymentDetails = await RazorpayObject.payments.fetch(paymentId);
-    console.log('----paymentDetails', paymentDetails);
+    let paymentDetails = await RazorpayObject.payments.fetch(paymentId);
+    // console.log('----paymentDetails', paymentDetails);
     // Check if payment has already been captured
     if (paymentDetails.status === 'captured') {
       savePaymentAndSubscription(paymentDetails, plan, paymentId, amount);
     } else {
-      const payment = await RazorpayObject.payments.capture(
+      const paymentDetails = await RazorpayObject.payments.capture(
         paymentId,
         amount * 100
       );
-      savePaymentAndSubscription(payment, plan, paymentId, amount);
+      savePaymentAndSubscription(paymentDetails, plan, paymentId, amount);
     }
-    return NextResponse.json({ status: payment.status });
+    return NextResponse.json({ status: paymentDetails.status });
   } catch (error) {
-    console.log('----here', error);
+    // console.log('----here', error);
     return NextResponse.json(
       { error: 'Error capturing payment' },
       { status: 500 }

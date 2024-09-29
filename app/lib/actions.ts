@@ -7,8 +7,11 @@ import {
   deleteInvoice,
   getAllHtmlTemplatesForUser,
   getHtmlTemplateById,
+  getUser,
+  getUserForResetToken,
   getUserSubscriptions,
   insertHtmlTemplate,
+  resetNewPasswordForUser,
   updateInvoice,
   updateTemplateContent,
 } from './data';
@@ -96,7 +99,8 @@ export async function authenticateAction(
   formData: FormData
 ) {
   try {
-    await signIn('credentials', formData);
+    const response = await signIn('credentials', formData);
+    // console.log('Response:', response);
     redirect('/dashboard');
   } catch (error) {
     if (error instanceof AuthError) {
@@ -254,4 +258,18 @@ export async function getUserSubscriptionsAction() {
 export async function signOutAction() {
   await signOut({ redirectTo: '/login' });
   redirect('/login');
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  // Step 1: Find user by token and check if token is still valid
+  const user = await getUserForResetToken(token);
+  // Step 2: Hash the new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Step 3: Update the user's password and clear the reset token and expiry
+  const updatedUser = await resetNewPasswordForUser({
+    userId: user.id,
+    hashedPassword,
+  });
+  return true;
 }

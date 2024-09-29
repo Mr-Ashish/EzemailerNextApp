@@ -16,8 +16,11 @@ model User {
   email    String @unique
   password String
   createdAt     DateTime         @default(now())
+  resetToken         String?  
+  resetTokenExpiry   DateTime? 
   subscriptions Subscription[]
   emailTemplates EmailTemplates[] 
+
 }
 
 model Invoice {

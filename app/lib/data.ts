@@ -508,3 +508,49 @@ export async function saveSubscription({
     };
   }
 }
+
+export async function getUserForResetToken(token: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: {
+          gte: new Date().toISOString(),
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('Invalid or expired token');
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error fetching user for reset token:', error);
+    throw new Error('Failed to fetch user for reset token');
+  }
+}
+
+export async function resetNewPasswordForUser({
+  userId,
+  hashedPassword,
+}: {
+  userId: string;
+  hashedPassword: string;
+}) {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    throw new Error('Failed to reset password');
+  }
+}

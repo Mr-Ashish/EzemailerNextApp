@@ -180,9 +180,18 @@ const revenue = [
   { month: 'Dec', revenue: 4800 },
 ];
 
+const modules = [
+  {
+    id: 1,
+    moduleName: 'Ezemailer',
+    description: 'Module to convert HTML to email',
+  },
+];
+
 module.exports = {
   users,
   customers,
   invoices,
   revenue,
+  modules,
 };
