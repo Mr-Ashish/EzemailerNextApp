@@ -9,8 +9,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { getUserSubscriptionsAction } from '@/app/lib/actions';
 
 export default function SideNav() {
+  const [subscription, setSubscription] = useState(null);
+  const fetchSubscriptionIfAny = async () => {
+    const userSubscriptions = await getUserSubscriptionsAction();
+    if (userSubscriptions.success) {
+      setSubscription(userSubscriptions.subscription);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubscriptionIfAny();
+  }, []);
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
       <Link

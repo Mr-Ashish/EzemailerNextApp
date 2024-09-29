@@ -1,8 +1,14 @@
-// 'use client';
+'use client';
 import { CheckCircle, Clock } from 'lucide-react'; // Icons for feature status
 import PaymentButton from '@/components/ui/paymentButton';
+import { useEffect, useState } from 'react';
+import { getUserSubscriptionsAction } from '@/app/lib/actions';
+import Link from 'next/link';
+import { Button } from '@/app/ui/button';
 
 export default function Dashboard() {
+  const [subscription, setSubscription] = useState(null);
+
   // Plans available in the tool
   const plans = [
     {
@@ -11,6 +17,8 @@ export default function Dashboard() {
       price: '$2',
       amount: 2,
       features: ['2 Template Creations', '5 Updates per Template'],
+      moduleName: 'Ezemailer',
+      moduleId: 1,
     },
     {
       id: 2,
@@ -18,6 +26,8 @@ export default function Dashboard() {
       price: '$5',
       amount: 5,
       features: ['Unlimited Template Creation', 'Unlimited Updates'],
+      moduleName: 'Ezemailer',
+      moduleId: 1,
     },
   ];
 
@@ -75,30 +85,59 @@ export default function Dashboard() {
     },
   ];
 
+  const fetchSubscriptionIfAny = async () => {
+    const userSubscriptions = await getUserSubscriptionsAction();
+    if (userSubscriptions.success) {
+      setSubscription(userSubscriptions.subscription);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubscriptionIfAny();
+  }, []);
+
   return (
     <div className="flex min-h-screen">
-      {/* Main Content */}
       <main className="flex-1 bg-gray-50 p-10">
-        {/* Plans Section */}
-        <h1 className="mb-6 text-3xl font-bold">Choose a Plan</h1>
-        <div className="mb-8 grid grid-cols-2 gap-6">
-          {plans.map((plan) => (
-            <div key={plan.id} className="rounded-lg border p-6 shadow-md">
-              <h2 className="mb-2 text-xl font-semibold">{plan.name}</h2>
-              <p className="mb-4 text-2xl font-bold">
-                {plan.price} (One time Payment)
-              </p>
-              <ul className="mb-4">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="text-sm text-gray-600">
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <PaymentButton amount={plan.amount} />
+        {subscription ? (
+          <div>
+            <h1 className="mb-6 text-3xl font-bold">Your Subscription</h1>
+            <div className="mb-8 rounded-lg border p-6 shadow-md">
+              <h2 className="mb-2 text-xl font-semibold">
+                Yay 🎉, you have an active subscription!
+              </h2>
+              <Link href="/dashboard/validator">
+                <Button className="mt-4">Start Creating Templates</Button>
+              </Link>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div>
+            <h1 className="mb-6 text-3xl font-bold">Choose a Plan</h1>
+            <div className="mb-8 grid grid-cols-2 gap-6">
+              {plans.map((plan) => (
+                <div key={plan.id} className="rounded-lg border p-6 shadow-md">
+                  <h2 className="mb-2 text-xl font-semibold">{plan.name}</h2>
+                  <p className="mb-4 text-2xl font-bold">
+                    {plan.price} (One time Payment)
+                  </p>
+                  <ul className="mb-4">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="text-sm text-gray-600">
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <PaymentButton
+                    amount={plan.amount}
+                    plan={plan}
+                    callBack={fetchSubscriptionIfAny}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Features Section */}
         <h1 className="mb-6 text-3xl font-bold">Features Available</h1>

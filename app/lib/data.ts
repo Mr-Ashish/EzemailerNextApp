@@ -12,6 +12,8 @@ import { formatCurrency } from './utils';
 import { PrismaClient } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
 import { auth } from '@/auth.config';
+import { use } from 'react';
+import { metadata } from '../dashboard/invoices/page';
 
 const prisma = new PrismaClient();
 
@@ -423,5 +425,86 @@ export async function getHtmlTemplateById(templateId: string) {
   } catch (error) {
     console.error('Error fetching template:', error);
     return { success: false, error: 'Failed to fetch template' };
+  }
+}
+
+export async function getUserSubscriptions() {
+  const session = await auth();
+
+  if (!session || !session.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const userEmail = session.user.email;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+      include: { subscriptions: true },
+    });
+    console.log('User:', user);
+
+    if (!user || !user.subscriptions.length) {
+      throw new Error('Subscription not found');
+    }
+
+    return user.subscriptions;
+  } catch (error) {
+    throw new Error(`Failed to get subscriptions: ${error.message}`);
+  }
+}
+
+export async function saveSubscription({
+  userId,
+  plan,
+  paymentId,
+  amount,
+}: {
+  userId: string;
+  plan: any;
+  paymentId: string;
+  amount: number;
+}) {
+  try {
+    // You can add logic to map the plan to its corresponding module
+    const subscriptionModule = await prisma.module.findUnique({
+      where: { id: plan.moduleId }, // Assuming your plan maps to moduleId
+    });
+    console.log('Subscription module:', subscriptionModule);
+    if (!subscriptionModule) {
+      throw new Error('Module not found for the selected plan');
+    }
+
+    // Calculate the subscription duration based on the plan (example: 1 month for Basic, etc.)
+    // const durationInMonths = plan === 'Basic Plan' ? 1 : 12;
+    const durationInMonths = 12; // Assuming 12 month for all plans
+
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + durationInMonths);
+
+    const subscription = await prisma.subscription.create({
+      data: {
+        userId,
+        moduleId: subscriptionModule.id,
+        subscriptionType: 'FULL', // Adjust based on the plan
+        price: amount, // Convert from cents/paise if necessary
+        durationInMonths,
+        startDate,
+        endDate,
+        createdAt: new Date(),
+        metadata: { plan, paymentId },
+      },
+    });
+    console.log('Subscription:', subscription);
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Error saving subscription: ', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to save subscription',
+    };
   }
 }

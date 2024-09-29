@@ -1,16 +1,47 @@
 import { NextResponse } from 'next/server';
 import RazorpayObject from '../../../../lib/razorpay';
+import { auth } from '@/auth.config';
+import { saveSubscription } from '@/app/lib/data';
+
+const savePaymentAndSubscription = async (
+  paymentDetails,
+  plan,
+  paymentId,
+  amount
+) => {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const userId = session.userId; // Assuming you have userId in the session
+
+  // Save subscription to the database
+  const result = await saveSubscription({
+    userId,
+    plan,
+    paymentId,
+    amount,
+  });
+};
 
 export async function POST(request: any) {
-  const { paymentId, amount } = await request.json();
+  const { paymentId, amount, plan } = await request.json();
   try {
-    const payment = await RazorpayObject.payments.capture(
-      paymentId,
-      amount * 100
-    );
-    return NextResponse.json(payment);
+    const paymentDetails = await RazorpayObject.payments.fetch(paymentId);
+    console.log('----paymentDetails', paymentDetails);
+    // Check if payment has already been captured
+    if (paymentDetails.status === 'captured') {
+      savePaymentAndSubscription(paymentDetails, plan, paymentId, amount);
+    } else {
+      const payment = await RazorpayObject.payments.capture(
+        paymentId,
+        amount * 100
+      );
+      savePaymentAndSubscription(payment, plan, paymentId, amount);
+    }
+    return NextResponse.json({ status: payment.status });
   } catch (error) {
-    // console.log('----here', error);
+    console.log('----here', error);
     return NextResponse.json(
       { error: 'Error capturing payment' },
       { status: 500 }

@@ -2,8 +2,17 @@
 import { Button } from '@/components/ui/button'; // ShadCN button component
 import { CreditCard, Loader } from 'lucide-react';
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-const PaymentButton = ({ amount }: { amount: number }) => {
+const PaymentButton = ({
+  amount,
+  plan,
+  callback,
+}: {
+  amount: number;
+  plan: any;
+  callback: () => {};
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const loadRazorpayScript = () => {
@@ -24,14 +33,20 @@ const PaymentButton = ({ amount }: { amount: number }) => {
       setIsLoading(false);
       return;
     }
-
+    // create a new reciept uuid
+    const receiptId = uuidv4();
     // Create order on the server
     const orderResponse = await fetch('/api/payment/order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1' }),
+      body: JSON.stringify({
+        amount,
+        currency: 'INR',
+        receipt: receiptId,
+        notes: { plan },
+      }),
     });
 
     const order = await orderResponse.json();
@@ -40,8 +55,8 @@ const PaymentButton = ({ amount }: { amount: number }) => {
       key: process.env.RAZORPAY_KEY_SECRET,
       amount: order.amount,
       currency: order.currency,
-      name: 'Your Company Name',
-      description: 'Test Transaction',
+      name: 'MicroAppLab',
+      description: 'Payment for Subscription',
       order_id: order.id,
       handler: async (response: any) => {
         const paymentData = {
@@ -55,12 +70,19 @@ const PaymentButton = ({ amount }: { amount: number }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ paymentId: paymentData.paymentId, amount }),
+          body: JSON.stringify({
+            paymentId: paymentData.paymentId,
+            amount,
+            plan,
+          }),
         });
 
         const payment = await captureResponse.json();
-        alert(`Payment successful: ${payment.status}`);
+        // alert(`Payment successful: ${payment.status}`);
         setIsLoading(false);
+        if (payment.status === 'captured') {
+          callback();
+        }
       },
       prefill: {
         name: 'Your Name',

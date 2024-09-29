@@ -7,6 +7,7 @@ import {
   deleteInvoice,
   getAllHtmlTemplatesForUser,
   getHtmlTemplateById,
+  getUserSubscriptions,
   insertHtmlTemplate,
   updateInvoice,
   updateTemplateContent,
@@ -16,7 +17,6 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth.config';
 import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
-import { use } from 'react';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -232,3 +232,13 @@ export const getTemplateByIdAction = async (templateId: string) => {
     return { success: false, error: 'Failed to fetch template' };
   }
 };
+
+export async function getUserSubscriptionsAction() {
+  try {
+    const subscriptions = await getUserSubscriptions();
+    return { success: true, subscription: subscriptions };
+  } catch (error) {
+    console.error('Failed to fetch subscriptions:', error);
+    return { success: false, error: 'No subscripts available' };
+  }
+}
