@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { getUserSubscriptionsAction } from '@/app/lib/actions';
+import { useState, useEffect } from 'react';
 
 export default function SideNav() {
   const [subscription, setSubscription] = useState(null);
