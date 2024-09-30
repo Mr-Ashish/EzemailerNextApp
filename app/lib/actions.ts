@@ -12,6 +12,7 @@ import {
   getUserSubscriptions,
   insertHtmlTemplate,
   resetNewPasswordForUser,
+  setResetTokenForUser,
   updateInvoice,
   updateTemplateContent,
 } from './data';
@@ -20,6 +21,7 @@ import { redirect } from 'next/navigation';
 import { signIn, signOut } from '@/auth.config';
 import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
+import { sendEmail } from './resendActions';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -260,7 +262,7 @@ export async function signOutAction() {
   redirect('/login');
 }
 
-export async function resetPassword(token: string, newPassword: string) {
+export async function resetPasswordAction(token: string, newPassword: string) {
   // Step 1: Find user by token and check if token is still valid
   const user = await getUserForResetToken(token);
   // Step 2: Hash the new password
@@ -272,4 +274,34 @@ export async function resetPassword(token: string, newPassword: string) {
     hashedPassword,
   });
   return true;
+}
+
+export async function sendResetPasswordMailAction(email: string) {
+  try {
+    const user = await getUser(email);
+    if (!user) throw new Error('No user found with that email address');
+
+    // Generate reset token and send email here
+    // For example, you can generate a reset token and store it in the database.
+    // After that, you'd send an email to the user with a reset link containing the token.
+    const resetToken = bcrypt.hashSync(user.email + Date.now(), 10);
+    await setResetTokenForUser({
+      email: user.email,
+      resetToken,
+      resetTokenExpiry: new Date(Date.now() + 3600000),
+    });
+
+    // Send email with the reset token
+    // console.log(`Send email to ${user.email} with token: ${resetToken}`);
+    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
+    const subject = 'Ezemailer Password Reset Request';
+    const htmlContent = `<p>Click the link below to reset your password:</p>
+                       <a href="${resetLink}">${resetLink}</a>`;
+
+    // await sendEmail(user.email, subject, htmlContent);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to reset password:', error);
+    return { success: false };
+  }
 }

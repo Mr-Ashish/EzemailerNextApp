@@ -243,11 +243,12 @@ export async function fetchFilteredCustomers(query: string) {
   }
 }
 
-export async function getUser(email: string) {
+export async function getUser(email: string): Promise<User | null> {
   try {
-    const user =
-      await prisma.$queryRaw`SELECT * FROM users WHERE email=${email}`;
-    return user.rows[0] as User;
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+    return user;
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
@@ -552,5 +553,30 @@ export async function resetNewPasswordForUser({
   } catch (error) {
     console.error('Error resetting password:', error);
     throw new Error('Failed to reset password');
+  }
+}
+
+export async function setResetTokenForUser({
+  email,
+  resetToken,
+  resetTokenExpiry,
+}: {
+  email: string;
+  resetToken: string;
+  resetTokenExpiry: any;
+}) {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { email: email },
+      data: {
+        resetToken,
+        resetTokenExpiry,
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error setting reset token:', error);
+    throw new Error('Failed to set reset token');
   }
 }
