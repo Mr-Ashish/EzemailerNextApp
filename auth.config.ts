@@ -68,8 +68,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       console.log('Session callback', { session, token });
-      session.userId = token.userId; // Add userId to session
-      return session;
+      const sessionClone = { ...session };
+      sessionClone.userId = (token.userId as string).toString(); // Add userId to session
+      return sessionClone;
     },
     async jwt({ token, user }) {
       console.log('JWT callback', { token, user });

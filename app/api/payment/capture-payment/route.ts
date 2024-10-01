@@ -4,16 +4,16 @@ import { auth } from '@/auth.config';
 import { saveSubscription } from '@/app/lib/data';
 
 const savePaymentAndSubscription = async (
-  paymentDetails,
-  plan,
-  paymentId,
-  amount
+  paymentDetails: any,
+  plan: any,
+  paymentId: string,
+  amount: number
 ) => {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const userId = session.userId; // Assuming you have userId in the session
+  const { userId } = session; // Assuming you have userId in the session
 
   // Save subscription to the database
   const result = await saveSubscription({

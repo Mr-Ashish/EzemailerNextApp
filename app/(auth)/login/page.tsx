@@ -13,12 +13,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useFormState } from 'react-dom';
+import { useState } from 'react';
 
-export function LoginForm() {
-  const [errorMessage, formAction, isPending] = useFormState(
+export default function LoginForm() {
+  const [errorMessage, formAction] = useFormState(
     authenticateAction,
     undefined
   );
+  const [isPending, setIsPending] = useState(false);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-6">
@@ -76,5 +78,3 @@ export function LoginForm() {
     </div>
   );
 }
-
-export default LoginForm;

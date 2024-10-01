@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +35,7 @@ export default function ForgotPasswordForm() {
     }
   }, [searchParams]);
 
-  const handleResetRequest = async (e) => {
+  const handleResetRequest = async (e: any) => {
     e.preventDefault();
 
     if (!email) {
@@ -63,7 +62,7 @@ export default function ForgotPasswordForm() {
     }
   };
 
-  const handleResetPassword = async (e) => {
+  const handleResetPassword = async (e: any) => {
     e.preventDefault();
 
     if (!email || !newPassword) {
@@ -76,7 +75,7 @@ export default function ForgotPasswordForm() {
     setSuccessMessage('');
 
     try {
-      const response = await resetPasswordAction({ token, email, newPassword });
+      const response = await resetPasswordAction(token, newPassword);
 
       if (response.success) {
         setSuccessMessage('Your password has been successfully reset.');
@@ -158,7 +157,8 @@ export default function ForgotPasswordForm() {
           <CardHeader>
             <CardTitle className="text-2xl">Forgot Password</CardTitle>
             <CardDescription>
-              Enter your email below and we'll send you a password reset link.
+              Enter your email below and we&apos;ll send you a password reset
+              link.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleResetRequest}>

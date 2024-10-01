@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import transformHtml from './utils';
 
-export async function POST(req) {
+export async function POST(req: any) {
   let htmlContent = null;
 
   // Check if the request contains formData (file upload) or JSON (html text)
@@ -99,7 +99,14 @@ export async function POST(req) {
   });
 
   const transformedHtml = transformHtml(htmlContent);
-
+  if (!transformedHtml) {
+    return NextResponse.json(
+      {
+        error: 'Error transforming HTML content.',
+      },
+      { status: 400 }
+    );
+  }
   // Return the transformed and sanitized HTML
   return NextResponse.json({
     transformedHtml: transformedHtml.data,

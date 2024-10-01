@@ -273,7 +273,7 @@ export async function resetPasswordAction(token: string, newPassword: string) {
     userId: user.id,
     hashedPassword,
   });
-  return true;
+  return { success: true };
 }
 
 export async function sendResetPasswordMailAction(email: string) {

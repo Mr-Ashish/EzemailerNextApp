@@ -91,7 +91,7 @@ const transformHtml = (html: any) => {
     table.appendChild(tbody);
     table.style.cssText = div.style.cssText;
     addDefaultStylesToTable(table);
-    div.childNodes.forEach((childNode) =>
+    div.childNodes.forEach((childNode: any) =>
       traverseAndConvert(document, childNode, tbody)
     );
     return table;
@@ -133,7 +133,7 @@ const transformHtml = (html: any) => {
     addDefaultStylesToTable(table);
     const tbody = document.createElement('tbody');
     table.appendChild(tbody);
-    node.childNodes.forEach((childNode) => {
+    node.childNodes.forEach((childNode: any) => {
       returnTextInCaseOfTextNode(document, childNode, tbody);
       traverseAndConvert(document, childNode, tbody);
     });

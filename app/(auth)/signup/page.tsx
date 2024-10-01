@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { signUpAction } from '@/app/lib/actions';
 import { useRouter } from 'next/navigation'; // Client-side navigation
 
-export function SignUpForm() {
+export default function SignUpForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +23,7 @@ export function SignUpForm() {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter(); // Next.js router for navigation
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     // Basic validation for empty fields
@@ -121,5 +121,3 @@ export function SignUpForm() {
     </div>
   );
 }
-
-export default SignUpForm;

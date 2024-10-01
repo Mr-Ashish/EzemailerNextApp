@@ -3,7 +3,7 @@
 import FileUpload from '@/components/ui/Validator/FileUpload';
 import PreviewComponent from '@/components/ui/Validator/PreviewComponent';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button'; // Importing Shadcn Button component
 import { ArrowLeft, ArrowRight, Clipboard, Download } from 'lucide-react'; // Importing icons
 
@@ -32,7 +32,7 @@ export default function EmailValidator() {
       if (templateId) {
         try {
           const result = await getTemplateByIdAction(templateId); // Call the server-side action to get the template
-          if (result.success && result.template) {
+          if (result.success && result.template && result.template.content) {
             setSanitizedData(JSON.parse(result.template.content)); // Assuming the content is in JSON format
           }
         } catch (error) {
@@ -48,21 +48,24 @@ export default function EmailValidator() {
     fetchTemplate();
   }, [templateId]);
 
-  const handleUpdateTemplate = async (content: string) => {
-    if (!templateId || !content) return;
+  const handleUpdateTemplate = useCallback(
+    async (content: string) => {
+      if (!templateId || !content) return;
 
-    const result = await updateTemplateAction(templateId, content); // Calls server action
-    if (result.success) {
-      console.log('Template updated successfully:', result.template);
-    } else {
-      console.error('Failed to update template:', result.error);
-    }
-  };
+      const result = await updateTemplateAction(templateId, content); // Calls server action
+      if (result.success) {
+        console.log('Template updated successfully:', result.template);
+      } else {
+        console.error('Failed to update template:', result.error);
+      }
+    },
+    [templateId]
+  );
 
   useEffect(() => {
     if (!sanitizedData || !templateId) return;
     handleUpdateTemplate(JSON.stringify(sanitizedData));
-  }, [sanitizedData, templateId]);
+  }, [sanitizedData, templateId, handleUpdateTemplate]);
 
   const handleFileUploadSuccess = (data: any) => {
     setSanitizedData(data);

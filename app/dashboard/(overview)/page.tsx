@@ -3,7 +3,7 @@ import { CheckCircle, Clock } from 'lucide-react'; // Icons for feature status
 import PaymentButton from '@/components/ui/paymentButton';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { useSubscription } from '../layout';
+import { useSubscription } from '@/app/lib/subscriptionContext';
 
 export default function Dashboard() {
   // Plans available in the tool

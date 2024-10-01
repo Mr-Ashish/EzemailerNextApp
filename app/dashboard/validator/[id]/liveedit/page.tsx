@@ -32,7 +32,7 @@ const LiveHtmlEditor: React.FC = () => {
       if (templateId) {
         try {
           const result = await getTemplateByIdAction(templateId); // Call the server-side action to get the template
-          if (result.success && result.template) {
+          if (result.success && result.template && result.template.content) {
             // Format the fetched HTML content
             const formattedHtml = beautifyHtml(
               JSON.parse(result.template.content).transformedHtml,

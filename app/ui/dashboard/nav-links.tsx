@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useSubscription } from '@/app/dashboard/layout';
+import { useSubscription } from '@/app/lib/subscriptionContext';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
