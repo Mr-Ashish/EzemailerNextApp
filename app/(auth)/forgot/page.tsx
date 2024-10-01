@@ -1,5 +1,7 @@
 'use client';
+
 import Link from 'next/link';
+import { Suspense, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,14 +12,13 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   sendResetPasswordMailAction,
   resetPasswordAction,
 } from '@/app/lib/actions';
 
-export default function ForgotPasswordForm() {
+function ForgotPasswordFormContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -92,10 +93,8 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-6">
-      {/* Ezemailer Heading */}
       <h1 className="text-4xl font-bold">Ezemailer</h1>
 
-      {/* If token exists, show the reset password form, otherwise show the forgot password form */}
       {token ? (
         <Card className="mx-auto max-w-sm">
           <CardHeader>
@@ -199,5 +198,13 @@ export default function ForgotPasswordForm() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function ForgotPasswordForm() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgotPasswordFormContent />
+    </Suspense>
   );
 }
