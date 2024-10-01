@@ -30,6 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     error: '/error',
     verifyRequest: '/forgot',
   },
+  debug: true,
   providers: [
     Credentials({
       credentials: {
