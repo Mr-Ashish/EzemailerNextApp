@@ -102,7 +102,7 @@ export async function authenticateAction(
 ) {
   try {
     const response = await signIn('credentials', formData);
-    // console.log('Response:', response);
+    console.log('Response:', response);
     redirect('/dashboard');
   } catch (error) {
     if (error instanceof AuthError) {
