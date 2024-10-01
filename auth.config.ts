@@ -57,6 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
+      console.log('Authorized callback', { auth, nextUrl });
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
       if (isOnDashboard) {

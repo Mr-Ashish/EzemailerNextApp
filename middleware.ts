@@ -49,13 +49,8 @@ const defaultConfig = {
 
 const { auth } = NextAuth(defaultConfig);
 
-export const middleware = auth(async function (req: NextRequest) {
-  const { nextUrl } = req;
-
-  console.log('middleware', req);
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  // console.log('token has been generated', token, process.env.AUTH_SECRET, req);
-  const isLoggedIn = !!token;
+export const middleware = auth(async function (req: any) {
+  const isLoggedIn = !!req.auth;
   console.log('isLoggedIn', isLoggedIn);
   const isAuthRoute = authRoutes.includes(req.nextUrl.pathname);
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth');
