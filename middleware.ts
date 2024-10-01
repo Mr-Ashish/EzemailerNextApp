@@ -54,7 +54,7 @@ export const middleware = auth(async function (req: any) {
   console.log('isLoggedIn', isLoggedIn);
   const isAuthRoute = authRoutes.includes(req.nextUrl.pathname);
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth');
-  // console.log('login', isLoggedIn, req);
+  console.log('login', isLoggedIn, isAuthRoute, isApiAuthRoute);
 
   // Allow the auth routes and API auth routes to pass through
   if (isApiAuthRoute) {
