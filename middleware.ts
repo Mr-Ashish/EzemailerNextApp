@@ -6,7 +6,9 @@ const authRoutes = ['/login', '/signup', '/error', '/forgot'];
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  console.log('token has been generated', token);
   const isLoggedIn = !!token;
+  console.log('isLoggedIn', isLoggedIn);
   const isAuthRoute = authRoutes.includes(req.nextUrl.pathname);
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth');
   // console.log('login', isLoggedIn, req);
@@ -24,6 +26,8 @@ export async function middleware(req: NextRequest) {
   }
 
   if (!isLoggedIn && !isAuthRoute) {
+    console.log('redirecting to login', isLoggedIn);
+
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
