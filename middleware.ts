@@ -1,11 +1,55 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { auth } from './auth.config';
+import NextAuth from 'next-auth';
 
 const authRoutes = ['/login', '/signup', '/error', '/forgot'];
 
-export default auth(async (req: NextRequest) => {
+const defaultConfig = {
+  pages: {
+    signIn: '/login',
+    signOut: '/logout',
+    error: '/error',
+    verifyRequest: '/forgot',
+  },
+  debug: true,
+  providers: [],
+  callbacks: {
+    async authorized({ auth, request: { nextUrl } }: any) {
+      const isLoggedIn = !!auth?.user;
+      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+      if (isOnDashboard) {
+        if (isLoggedIn) return true;
+        return false; // Redirect unauthenticated users to login page
+      } else if (isLoggedIn) {
+        return Response.redirect(new URL('/dashboard', nextUrl));
+      }
+      return true;
+    },
+    async session({ session, token }: any) {
+      console.log('Session callback', { session, token });
+      const sessionClone = { ...session };
+      sessionClone.userId = (token.userId as string).toString(); // Add userId to session
+      return sessionClone;
+    },
+    async jwt({ token, user }: any) {
+      console.log('JWT callback', { token, user });
+
+      if (user) {
+        token.userId = user.id; // Add userId to JWT token
+      }
+      return token;
+    },
+  },
+  session: {
+    strategy: 'jwt',
+  },
+  secret: process.env.AUTH_SECRET, // Add this line
+};
+
+const { auth } = NextAuth(defaultConfig);
+
+export const middleware = auth(async function (req: NextRequest) {
   const { nextUrl } = req;
 
   console.log('middleware', req);
