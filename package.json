@@ -1,4 +1,5 @@
 {
+  "name": "ezemailer",
   "private": true,
   "scripts": {
     "build": "next build",

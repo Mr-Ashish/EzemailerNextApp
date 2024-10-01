@@ -41,7 +41,7 @@ export async function POST(request: any) {
     }
     return NextResponse.json({ status: paymentDetails.status });
   } catch (error) {
-    // console.log('----here', error);
+    console.log('Error occured while capturing payment', error);
     return NextResponse.json(
       { error: 'Error capturing payment' },
       { status: 500 }
