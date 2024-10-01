@@ -77,5 +77,5 @@ export const middleware = auth(async function (req: any) {
 });
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.(png|svg)$).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$|.*\\.svg$).*)'],
 };
