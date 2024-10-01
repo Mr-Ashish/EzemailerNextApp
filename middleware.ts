@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import NextAuth from 'next-auth';
 
-const authRoutes = ['/login', '/signup', '/error', '/forgot'];
+const authRoutes = ['/', '/login', '/signup', '/error', '/forgot'];
 
 const defaultConfig = {
   pages: {
@@ -77,5 +77,5 @@ export const middleware = auth(async function (req: any) {
 });
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.(png|svg)$).*)'],
 };
