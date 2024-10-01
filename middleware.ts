@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import { auth } from './auth.config';
 
 const authRoutes = ['/login', '/signup', '/error', '/forgot'];
 
-export default async function middleware(req: NextRequest) {
+export default auth(async (req: NextRequest) => {
+  const { nextUrl } = req;
+
   console.log('middleware', req);
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  console.log('token has been generated', token, process.env.AUTH_SECRET, req);
+  // console.log('token has been generated', token, process.env.AUTH_SECRET, req);
   const isLoggedIn = !!token;
   console.log('isLoggedIn', isLoggedIn);
   const isAuthRoute = authRoutes.includes(req.nextUrl.pathname);
@@ -32,7 +35,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
