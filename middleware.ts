@@ -4,7 +4,8 @@ import { getToken } from 'next-auth/jwt';
 
 const authRoutes = ['/login', '/signup', '/error', '/forgot'];
 
-export async function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
+  console.log('middleware', req);
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
   console.log('token has been generated', token, process.env.AUTH_SECRET, req);
   const isLoggedIn = !!token;
