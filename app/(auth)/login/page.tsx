@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { authenticateAction } from '@/app/lib/actions';
+import { useRouter } from 'next/navigation'; // Use router for navigation after login
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,15 +13,33 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useFormState } from 'react-dom';
-import { useState } from 'react';
+import { authenticateAction } from '@/app/lib/actions';
 
 export default function LoginForm() {
-  const [errorMessage, formAction] = useFormState(
-    authenticateAction,
-    undefined
-  );
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isPending, setIsPending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsPending(true);
+    setErrorMessage('');
+
+    try {
+      const response = await authenticateAction(email, password);
+      if (response.success) {
+        router.push('/dashboard');
+      } else {
+        setErrorMessage(response.error || 'Invalid login credentials.');
+      }
+    } catch (error) {
+      setErrorMessage('An error occurred. Please try again later.');
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center space-y-6">
@@ -35,7 +54,7 @@ export default function LoginForm() {
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
-        <form action={formAction}>
+        <form onSubmit={handleSubmit}>
           <CardContent>
             <div className="grid gap-4">
               <div className="grid gap-2">
@@ -45,6 +64,8 @@ export default function LoginForm() {
                   type="email"
                   name="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -58,11 +79,21 @@ export default function LoginForm() {
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" name="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? 'Logging in...' : 'Login'}
               </Button>
+              {errorMessage && (
+                <p className="mt-2 text-sm text-red-500">{errorMessage}</p>
+              )}
             </div>
           </CardContent>
         </form>

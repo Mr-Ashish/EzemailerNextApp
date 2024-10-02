@@ -96,21 +96,21 @@ export async function deleteInvoiceAction(id: string) {
   revalidatePath('/dashboard/invoices');
 }
 
-export async function authenticateAction(
-  prevState: string | undefined,
-  formData: FormData
-) {
+export async function authenticateAction(email: string, password: string) {
   try {
-    const response = await signIn('credentials', formData);
-    console.log('Response:', response);
-    redirect('/dashboard');
+    const response = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
+    return { success: true, response };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid credentials.';
+          return { success: false, error: 'Invalid credentials.' };
         default:
-          return 'Something went wrong.';
+          return { success: false, error: 'Something went wrong.' };
       }
     }
     throw error;
