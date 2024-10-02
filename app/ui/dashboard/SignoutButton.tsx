@@ -2,7 +2,7 @@
 'use client';
 
 import { PowerIcon } from '@heroicons/react/24/outline';
-import { signOut } from '@/auth.config';
+import { signOut } from '@/auth';
 
 export default function SignOutButton() {
   const handleSignOut = async () => {

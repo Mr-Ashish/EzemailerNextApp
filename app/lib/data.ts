@@ -11,7 +11,7 @@ import {
 import { formatCurrency } from './utils';
 import { PrismaClient } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
-import { auth } from '@/auth.config';
+import { auth } from '@/auth';
 import { use } from 'react';
 import { metadata } from '../dashboard/invoices/page';
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import RazorpayObject from '../../../../lib/razorpay';
-import { auth } from '@/auth.config';
+import { auth } from '@/auth';
 import { saveSubscription } from '@/app/lib/data';
 
 const savePaymentAndSubscription = async (

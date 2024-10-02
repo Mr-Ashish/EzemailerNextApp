@@ -1,29 +1,6 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
-import type { User } from '@/app/lib/definitions';
-import bcrypt from 'bcrypt';
-import { sendEmail } from './app/lib/resendActions';
+import { NextAuthConfig } from 'next-auth';
 
-const prisma = new PrismaClient();
-
-async function getUser(email: string): Promise<User | null> {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    return user;
-  } catch (error) {
-    console.error('Failed to fetch user:', error);
-    throw new Error('Failed to fetch user.');
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export default {
   pages: {
     signIn: '/login',
     signOut: '/logout',
@@ -31,30 +8,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     verifyRequest: '/forgot',
   },
   debug: true,
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: 'Email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
-          .safeParse(credentials);
-
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          const user = await getUser(email);
-          if (!user || !user.password) return null;
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) return user;
-        } else {
-          console.log('Invalid credentials');
-          return null;
-        }
-      },
-    }),
-  ],
+  providers: [],
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
       console.log('Authorized callback', { auth, nextUrl });
@@ -87,4 +41,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: 'jwt',
   },
   secret: process.env.AUTH_SECRET, // Add this line
-});
+} as NextAuthConfig;

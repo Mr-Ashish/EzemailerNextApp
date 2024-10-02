@@ -18,7 +18,7 @@ import {
 } from './data';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn, signOut } from '@/auth.config';
+import { signIn, signOut } from '@/auth';
 import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
 import { sendEmail } from './resendActions';

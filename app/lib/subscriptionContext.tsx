@@ -20,6 +20,7 @@ export function SubscriptionProvider({
 
   const fetchSubscriptionIfAny = async () => {
     const userSubscriptions = await getUserSubscriptionsAction();
+    console.log('User subscriptions:', userSubscriptions);
     if (userSubscriptions.success) {
       setSubscription(userSubscriptions.subscription);
     }
