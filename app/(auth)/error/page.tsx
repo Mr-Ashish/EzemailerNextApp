@@ -1,6 +1,6 @@
 // pages/auth/error.js
 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AuthError() {
