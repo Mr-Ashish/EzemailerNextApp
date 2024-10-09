@@ -54,7 +54,6 @@ export default function EmailValidator() {
 
       const result = await updateTemplateAction(templateId, content); // Calls server action
       if (result.success) {
-        console.log('Template updated successfully:', result.template);
       } else {
         console.error('Failed to update template:', result.error);
       }

@@ -83,8 +83,6 @@ export default function Dashboard() {
   ];
   const subscription = useSubscription();
   const handlePaymentSuccess = () => {
-    // reload the website to fetch the subscription
-    console.log('----- here reloading to get latest subscription');
     window.location.reload();
   };
 

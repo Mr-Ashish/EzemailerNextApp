@@ -11,7 +11,6 @@ export default {
   providers: [],
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
-      console.log('Authorized callback', { auth, nextUrl });
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
       if (isOnDashboard) {
@@ -23,14 +22,11 @@ export default {
       return true;
     },
     async session({ session, token }) {
-      console.log('Session callback', { session, token });
       const sessionClone = { ...session };
       sessionClone.userId = (token.userId as string).toString(); // Add userId to session
       return sessionClone;
     },
     async jwt({ token, user }) {
-      console.log('JWT callback', { token, user });
-
       if (user) {
         token.userId = user.id; // Add userId to JWT token
       }

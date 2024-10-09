@@ -16,7 +16,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import {
   sendResetPasswordMailAction,
   resetPasswordAction,
-} from '@/app/lib/actions';
+} from '@/app/lib/authActions';
 
 function ForgotPasswordFormContent() {
   const searchParams = useSearchParams();

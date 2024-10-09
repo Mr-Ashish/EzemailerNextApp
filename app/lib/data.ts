@@ -12,8 +12,6 @@ import { formatCurrency } from './utils';
 import { PrismaClient } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
 import { auth } from '@/auth';
-import { use } from 'react';
-import { metadata } from '../dashboard/invoices/page';
 
 const prisma = new PrismaClient();
 
@@ -325,14 +323,20 @@ export async function deleteInvoice(id: string) {
 export async function createUser(
   name: string,
   email: string,
-  hashedPassword: string
+  hashedPassword: string,
+  verificationToken: string
 ) {
   try {
+    const verificationTokenExpiry = verificationToken
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000)
+      : null;
     const user = await prisma.user.create({
       data: {
         name: name,
         email: email,
         password: hashedPassword,
+        verificationToken,
+        verificationTokenExpiry,
       },
     });
     return user;
@@ -532,6 +536,29 @@ export async function getUserForResetToken(token: string) {
   }
 }
 
+export async function getUserForVerificationToken(
+  token: string,
+  email: string
+) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email,
+        verificationToken: token,
+      },
+    });
+
+    if (!user) {
+      throw new Error('Invalid or expired token');
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error fetching user for verification token:', error);
+    throw new Error('Failed to fetch user for verification token');
+  }
+}
+
 export async function resetNewPasswordForUser({
   userId,
   hashedPassword,
@@ -578,5 +605,62 @@ export async function setResetTokenForUser({
   } catch (error) {
     console.error('Error setting reset token:', error);
     throw new Error('Failed to set reset token');
+  }
+}
+
+export async function updateVerificationStatusForEmail(email: string) {
+  try {
+    const user = await prisma.user.update({
+      where: { email },
+      data: {
+        isVerified: true,
+        verificationToken: null,
+        verificationTokenExpiry: null,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error('Error updating verification status:', error);
+    throw new Error('Failed to update verification status');
+  }
+}
+
+export async function updateUserVerificationToken(
+  email: string,
+  verificationToken: string
+) {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data: {
+        verificationToken,
+        verificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating verification token:', error);
+    throw new Error('Failed to update verification token');
+  }
+}
+
+export async function updateEmailVerificationStatus(
+  email: string,
+  isVerified: boolean
+) {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data: {
+        isVerified,
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating email verification status:', error);
+    throw new Error('Failed to update email verification status');
   }
 }

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { authenticateAction } from '@/app/lib/actions';
+import { authenticateAction } from '@/app/lib/authActions';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -29,10 +29,15 @@ export default function LoginForm() {
 
     try {
       const response = await authenticateAction(email, password);
+      if (!response) return;
       if (response.success) {
         router.push('/dashboard');
       } else {
-        setErrorMessage(response.error || 'Invalid login credentials.');
+        if (response.error == 'EmailVerificationPending') {
+          router.push('/verify');
+        } else {
+          setErrorMessage(response.error || 'Invalid login credentials.');
+        }
       }
     } catch (error) {
       setErrorMessage('An error occurred. Please try again later.');

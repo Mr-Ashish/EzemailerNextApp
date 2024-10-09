@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Complex HTML Structure</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background-color: #555;
+      padding: 10px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+    }
+    nav a:hover {
+      background-color: #333;
+    }
+    .container {
+      display: flex;
+      margin: 20px;
+    }
+    .sidebar {
+      width: 25%;
+      padding: 20px;
+      background-color: #f4f4f4;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .content {
+      width: 75%;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .content img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 20px 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .grid-item {
+      background-color: #eee;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to the Complex HTML Page</h1>
+  </header>
+
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Services</a>
+    <a href="#">Contact</a>
+  </nav>
+
+  <div class="container">
+    <!-- Sidebar Section -->
+    <aside class="sidebar">
+      <h2>Sidebar</h2>
+      <p>This is the sidebar section where you can place additional information, links, or ads.</p>
+      <ul>
+        <li><a href="#">Link 1</a></li>
+        <li><a href="#">Link 2</a></li>
+        <li><a href="#">Link 3</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Section -->
+    <section class="content">
+      <h2>Main Content Area</h2>
+      <p>This is the main content area. Here you can add paragraphs, images, and other HTML components.</p>
+      
+      <img src="https://via.placeholder.com/800x400" alt="Sample Image">
+
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vel orci auctor, fermentum nulla non, lacinia lorem. Curabitur sit amet feugiat lectus.</p>
+      
+      <h3>Image Gallery</h3>
+      <div class="grid">
+        <div class="grid-item">
+          <img src="https://via.placeholder.com/200" alt="Gallery Image 1">
+          <p>Image 1 description</p>
+        </div>
+        <div class="grid-item">
+          <img src="https://via.placeholder.com/200" alt="Gallery Image 2">
+          <p>Image 2 description</p>
+        </div>
+        <div class="grid-item">
+          <img src="https://via.placeholder.com/200" alt="Gallery Image 3">
+          <p>Image 3 description</p>
+        </div>
+      </div>
+
+      <h3>Additional Information</h3>
+      <p>Vivamus dapibus, mi nec volutpat tristique, justo lorem auctor elit, vitae bibendum enim sem ac risus.</p>
+
+      <img src="https://via.placeholder.com/800x300" alt="Another Sample Image">
+      
+      <p>Donec laoreet, nulla in facilisis venenatis, lorem ex vehicula nisl, id lobortis purus turpis sed magna.</p>
+    </section>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Complex HTML Page. All rights reserved.</p>
+  </footer>
+</body>
+</html>

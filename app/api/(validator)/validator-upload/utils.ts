@@ -422,8 +422,6 @@ const transformHtml = (html: any) => {
     addDefaultStylesToTable(table);
     checkNodeAttributesForWarnings(node);
     traverseAndConvert(document, node, tbody);
-    console.log('limitedSupportErrorMessages', limitedSupportErrorMessages);
-    console.log('noSupportErrorMessages', noSupportErrorMessages);
     // Clear traversedElements for next conversion
     traversedElements.length = 0;
     return table;

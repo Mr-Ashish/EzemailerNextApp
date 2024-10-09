@@ -8,6 +8,9 @@ import authConfig from './auth.config';
 
 const prisma = new PrismaClient();
 
+const isVerificationEmailDisabled =
+  process.env.DISABLE_VERIFICATION_EMAIL === 'true';
+
 async function getUser(email: string): Promise<User | null> {
   try {
     const user = await prisma.user.findUnique({
@@ -28,8 +31,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        email: { label: 'Email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: 'Email', type: 'email', placeholder: 'm@example.com' },
+        password: {
+          label: 'Password',
+          type: 'password',
+          placeholder: 'password',
+        },
       },
       async authorize(credentials) {
         const parsedCredentials = z
@@ -39,13 +46,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
           const user = await getUser(email);
-          if (!user || !user.password) return null;
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) return user;
-        } else {
-          console.log('Invalid credentials');
-          return null;
+
+          if (!user || !user.password) {
+            return null;
+          }
+          const isValid = await bcrypt.compare(password, user.password);
+          if (!isValid) {
+            return null;
+          }
+          if (!user.isVerified && !isVerificationEmailDisabled) {
+            throw new Error('EmailVerificationPending');
+          }
+          if (isValid)
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+            };
         }
+        return null;
       },
     }),
   ],

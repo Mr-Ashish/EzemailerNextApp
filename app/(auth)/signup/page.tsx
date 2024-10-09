@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { signUpAction } from '@/app/lib/actions';
+import { signUpAction } from '@/app/lib/authActions';
 import { useRouter } from 'next/navigation'; // Client-side navigation
 
 export default function SignUpForm() {
@@ -39,7 +39,7 @@ export default function SignUpForm() {
       const result = await signUpAction(name, email, password);
       if (result?.success) {
         // Redirect to the dashboard after successful sign-up and sign-in
-        router.push('/dashboard');
+        router.push(result.nextRoute);
       } else {
         console.error(result);
         const error = result?.error

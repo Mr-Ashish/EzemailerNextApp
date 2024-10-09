@@ -4,7 +4,7 @@ This is the starter template for the Next.js App Router Course. It contains the 
 
 For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
 
-
+Use this for auth setup: https://github.com/Hairetsucodes/NJS14-Portfolio/blob/master/middleware.ts
 
 ## Prisma
 Steps to make prisma changes(intial as well as update)

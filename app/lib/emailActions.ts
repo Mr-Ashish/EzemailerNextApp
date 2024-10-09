@@ -14,8 +14,10 @@ export async function sendEmail(
       subject,
       html: htmlContent,
     });
-
-    console.log('Email sent successfully:', emailResponse);
+    if (emailResponse.error) {
+      console.error('Failed to send email:', emailResponse.error);
+      return { success: false, error: emailResponse.error.message };
+    }
     return emailResponse;
   } catch (error) {
     console.error('Failed to send email:', error);

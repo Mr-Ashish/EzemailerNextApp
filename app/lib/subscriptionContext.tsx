@@ -1,6 +1,6 @@
 // subscription-context.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getUserSubscriptionsAction } from '@/app/lib/actions';
+import { getUserSubscriptionsAction } from '@/app/lib/authActions';
 
 // Create context
 const SubscriptionContext = createContext(null);
