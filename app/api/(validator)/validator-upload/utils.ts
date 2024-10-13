@@ -104,7 +104,6 @@ const transformHtml = (html: any) => {
   // if the div is of any other type then it will return the div as it is
   // if the div is not of flexbox or grid layout then it will return the div as it is
   function convertDivToTableStructure(document: any, div: any) {
-    //   console.log("converting div to table structure", div.id);
     // check if the div is flexbox or not
     const isFlexbox = div.style.display === 'flex';
     if (isFlexbox) {
@@ -337,7 +336,6 @@ const transformHtml = (html: any) => {
     style: any,
     styleValue: any
   ) {
-    // console.log('addToErrorMessages', messageObject, key, style, styleValue);
     let message = '';
     if (styleValue) {
       message = `${style}: ${styleValue}`;
@@ -357,7 +355,6 @@ const transformHtml = (html: any) => {
     for (let i = 0; i < node.style.length; i++) {
       const style = node.style[i];
       const styleValue = node.style[style];
-      // console.log("Checking style attribute", style);
       //check if the style attribute is present in the styleAttributesCommonlyUsed object for any key of the object
       if (
         !styleAttributesCommonlyUsed.textStyles.includes(style) &&
@@ -367,11 +364,6 @@ const transformHtml = (html: any) => {
       ) {
         for (const key in styleAttributesLimitedSupport) {
           if (styleAttributesLimitedSupport[key].includes(style)) {
-            //   console.log(
-            //     "Warning: Style attribute",
-            //     style,
-            //     "is not fully supported in email clients."
-            //   );
             addToErrorMessages(
               limitedSupportErrorMessages,
               key,
@@ -382,11 +374,6 @@ const transformHtml = (html: any) => {
         }
         for (const key in styleAttributesNoSupport) {
           if (styleAttributesNoSupport[key].includes(style)) {
-            //   console.log(
-            //     "Error: Style attribute",
-            //     style,
-            //     "is not supported in email clients."
-            //   );
             addToErrorMessages(noSupportErrorMessages, key, style, styleValue);
           }
         }
@@ -395,11 +382,6 @@ const transformHtml = (html: any) => {
 
     // check if the node tag is present in the emailSupportedHtmlTags array or not
     if (!emailSupportedHtmlTags.includes(node.tagName.toLowerCase())) {
-      // console.log(
-      //   "Error: HTML tag",
-      //   node.tagName.toLowerCase(),
-      //   "is not supported in email clients."
-      // );
       addToErrorMessages(
         noSupportErrorMessages,
         'HTML Tags',
@@ -477,7 +459,6 @@ const transformHtml = (html: any) => {
     body
   );
   const wrappedHtml = wrapTableNodeWithHtmlAndBodyTags(document, table);
-  // console.log('wrappedHtml', wrappedHtml.outerHTML);
   return {
     data: wrappedHtml.outerHTML,
     errors: { limitedSupportErrorMessages, noSupportErrorMessages },

@@ -92,7 +92,6 @@ export async function signUpAction(
           password,
           redirect: false,
         });
-        console.log('----here', signInResult);
         if (!signInResult?.error) {
           return { success: true, nextRoute: '/dashboard' };
         } else {
@@ -102,7 +101,6 @@ export async function signUpAction(
       return { success: true, nextRoute: '/verify' };
     }
     if (!result.success) {
-      // console.log('Validation failed with the following errors:');
       result.error.issues.forEach((issue) => {
         console.log(`Path: ${issue.path.join('.')}, Issue: ${issue.message}`);
       });
@@ -145,7 +143,6 @@ export async function sendResetPasswordMailAction(email: string) {
     });
 
     // Send email with the reset token
-    // console.log(`Send email to ${user.email} with token: ${resetToken}`);
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
     const subject = 'Ezemailer Password Reset Request';
     const htmlContent = `<p>Click the link below to reset your password:</p>

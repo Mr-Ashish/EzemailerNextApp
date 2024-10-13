@@ -89,7 +89,6 @@ export async function deleteInvoiceAction(id: string) {
 export async function getHtmlTemplates(userId: string) {
   try {
     const templates = await getAllHtmlTemplatesForUser(userId);
-    // console.log('Templates:', templates);
     return { success: true, templates };
   } catch (error) {
     console.error('Failed to fetch templates:', error);
@@ -103,7 +102,6 @@ export async function createHtmlTemplateAction(
 ) {
   try {
     const result = await insertHtmlTemplate(name, description);
-    console.log('Result:', result.template);
     if (result.success) {
       return { success: true, template: result.template };
     }
@@ -120,7 +118,6 @@ export async function updateTemplateAction(
 ) {
   try {
     const result = await updateTemplateContent(templateId, newContent);
-    console.log('Result:', result.template);
     if (result.success) {
       return { success: true, template: result.template };
     }
@@ -134,8 +131,6 @@ export async function updateTemplateAction(
 export const deleteTemplateAction = async (templateId: string) => {
   const result = await deleteHtmlTemplate(templateId);
   if (result.success) {
-    // Optionally, update your state or provide user feedback
-    console.log('Template deleted successfully:', result.template);
     return { success: true };
   } else {
     console.error('Failed to delete template:', result.error);
@@ -145,7 +140,6 @@ export const deleteTemplateAction = async (templateId: string) => {
 export const getTemplateByIdAction = async (templateId: string) => {
   const result = await getHtmlTemplateById(templateId);
   if (result.success) {
-    console.log('Template fetched:', result.template);
     return { success: true, template: result.template };
   } else {
     console.error('Failed to fetch template:', result.error);

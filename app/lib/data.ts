@@ -343,7 +343,6 @@ export async function insertHtmlTemplate(name: string, description?: string) {
   try {
     const session = await auth();
     const currentSignedInUser = session.userId;
-    console.log('Current user:', session);
     if (!currentSignedInUser) {
       return { success: false, error: 'User not found' };
     }
@@ -375,7 +374,6 @@ export async function updateTemplateContent(
         content: newContent,
       },
     });
-    console.log('Updated template:', updatedTemplate);
     return { success: true, template: updatedTemplate };
   } catch (error) {
     console.error('Error updating template content:', error);
@@ -431,7 +429,6 @@ export async function getUserSubscriptions() {
       where: { email: userEmail },
       include: { subscriptions: true },
     });
-    console.log('User:', user);
 
     if (!user || !user.subscriptions.length) {
       throw new Error('Subscription not found');
@@ -459,7 +456,6 @@ export async function saveSubscription({
     const subscriptionModule = await prisma.module.findUnique({
       where: { id: plan.moduleId }, // Assuming your plan maps to moduleId
     });
-    console.log('Subscription module:', subscriptionModule);
     if (!subscriptionModule) {
       throw new Error('Module not found for the selected plan');
     }
@@ -485,7 +481,6 @@ export async function saveSubscription({
         metadata: { plan, paymentId },
       },
     });
-    console.log('Subscription:', subscription);
     return {
       success: true,
     };

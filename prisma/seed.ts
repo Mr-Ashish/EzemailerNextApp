@@ -27,7 +27,6 @@ async function seedUsers() {
 
 async function seedInvoices() {
   for (const invoice of invoices) {
-    // console.log('Inserting invoice for customerId:', invoice.customer_id); // Debug output
     await prisma.invoice.create({
       data: {
         customer_id: invoice.customer_id,

@@ -79,7 +79,6 @@ const PaymentButton = ({
         });
 
         const payment = await captureResponse.json();
-        // console.log('---here', payment);
         // alert(`Payment successful: ${payment.status}`);
         setIsLoading(false);
         if (payment.status === 'captured' && callback) {

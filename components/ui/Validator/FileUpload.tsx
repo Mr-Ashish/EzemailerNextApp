@@ -116,7 +116,7 @@ const FileUploadDialog: React.FC<FileUploadProps> = ({
           <Button
             variant="default"
             size="lg"
-            className="m-4 flex items-center space-x-2"
+            className="m-4 flex items-center justify-center space-x-2"
           >
             <Upload className="h-5 w-5" />
             <span>Open File Upload Dialog</span>

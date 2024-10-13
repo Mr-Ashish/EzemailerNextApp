@@ -19,9 +19,7 @@ async function seedUsers(client) {
         password TEXT NOT NULL
       );
     `;
-
     console.log(`Created "users" table`);
-
     // Insert data into the "users" table
     const insertedUsers = await Promise.all(
       users.map(async (user) => {
@@ -31,9 +29,8 @@ async function seedUsers(client) {
         VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
         ON CONFLICT (id) DO NOTHING;
       `;
-      }),
+      })
     );
-
     console.log(`Seeded ${insertedUsers.length} users`);
 
     return {
@@ -70,8 +67,8 @@ async function seedInvoices(client) {
         INSERT INTO invoices (customer_id, amount, status, date)
         VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
         ON CONFLICT (id) DO NOTHING;
-      `,
-      ),
+      `
+      )
     );
 
     console.log(`Seeded ${insertedInvoices.length} invoices`);
@@ -109,8 +106,8 @@ async function seedCustomers(client) {
         INSERT INTO customers (id, name, email, image_url)
         VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
         ON CONFLICT (id) DO NOTHING;
-      `,
-      ),
+      `
+      )
     );
 
     console.log(`Seeded ${insertedCustomers.length} customers`);
@@ -144,8 +141,8 @@ async function seedRevenue(client) {
         INSERT INTO revenue (month, revenue)
         VALUES (${rev.month}, ${rev.revenue})
         ON CONFLICT (month) DO NOTHING;
-      `,
-      ),
+      `
+      )
     );
 
     console.log(`Seeded ${insertedRevenue.length} revenue`);
@@ -174,6 +171,6 @@ async function main() {
 main().catch((err) => {
   console.error(
     'An error occurred while attempting to seed the database:',
-    err,
+    err
   );
 });

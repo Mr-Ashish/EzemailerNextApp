@@ -28,7 +28,6 @@ export async function POST(request: any) {
   const { paymentId, amount, plan } = await request.json();
   try {
     let paymentDetails = await RazorpayObject.payments.fetch(paymentId);
-    // console.log('----paymentDetails', paymentDetails);
     // Check if payment has already been captured
     if (paymentDetails.status === 'captured') {
       savePaymentAndSubscription(paymentDetails, plan, paymentId, amount);

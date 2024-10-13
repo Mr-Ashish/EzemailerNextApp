@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import ErrorDisplay from '@/components/ui/Validator/TemplateErrors';
 
 export default function EmailValidator() {
   const [sanitizedData, setSanitizedData] = useState<any>(null);
@@ -111,8 +112,11 @@ export default function EmailValidator() {
     <div className="flex h-full w-full items-center justify-center">
       {!sanitizedData ? (
         // Show only FileUpload component in the center of the screen before the file is uploaded
-        <div className="flex h-screen w-full items-center justify-center">
-          <div className="w-full max-w-md">
+        <div className="flex h-screen w-full flex-col items-center justify-center align-middle">
+          <div className="text-xl font-semibold">
+            Start by uploading your html template{' '}
+          </div>
+          <div className="flex w-full max-w-md justify-center">
             <FileUpload
               onUploadSuccess={handleFileUploadSuccess}
               isEditView={false}
@@ -153,20 +157,6 @@ export default function EmailValidator() {
                 Preview Transformed HTML
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-            </div>
-
-            {/* Warnings Section */}
-            <div className="mt-6">
-              <h2 className="text-lg font-semibold">Warnings</h2>
-              {sanitizedData?.errors && sanitizedData.errors.length > 0 ? (
-                <ul className="ml-4 list-disc text-red-600">
-                  {sanitizedData.errors.map((error: string, index: number) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No warnings or errors found.</p>
-              )}
             </div>
           </div>
 
@@ -284,6 +274,13 @@ export default function EmailValidator() {
                   )}
                 </Tooltip>
               </div>
+              {/* Warnings Section */}
+              {previewMode === 'original' ? (
+                <div className="mt-6">
+                  <h2 className="text-lg font-semibold">Warnings</h2>
+                  <ErrorDisplay errors={sanitizedData.errors} />
+                </div>
+              ) : null}
             </TooltipProvider>
 
             {/* Live Edit Button for Transformed HTML */}
