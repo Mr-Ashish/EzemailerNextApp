@@ -44,7 +44,7 @@ const PaymentButton = ({
       },
       body: JSON.stringify({
         amount,
-        currency: 'INR',
+        currency: 'USD',
         receipt: receiptId,
         notes: { plan },
       }),
