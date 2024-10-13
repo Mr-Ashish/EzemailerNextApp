@@ -20,7 +20,7 @@ import { sendEmail } from './emailActions';
 import { v4 as uuidv4 } from 'uuid';
 
 const isVerificationEmailDisabled =
-  process.env.DISABLE_VERIFICATION_EMAIL === 'true';
+  process.env.DISABLE_EMAIL_VERIFICATION === 'true';
 
 export async function authenticateAction(email: string, password: string) {
   try {
@@ -67,7 +67,14 @@ export async function signUpAction(
       const { email, password } = result.data;
       const hashedPassword = await bcrypt.hash(password, 10);
       const verificationToken = isVerificationEmailDisabled ? null : uuidv4();
-
+      // check is user already exixts
+      const userExists = await getUser(email);
+      if (userExists) {
+        return {
+          success: false,
+          error: 'User already exists. Signin to continue',
+        };
+      }
       const user = await createUser(
         name,
         email,

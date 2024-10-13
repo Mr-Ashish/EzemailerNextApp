@@ -24,6 +24,8 @@ export default {
     async session({ session, token }) {
       const sessionClone = { ...session };
       sessionClone.userId = (token.userId as string).toString(); // Add userId to session
+      console.log('session', sessionClone);
+
       return sessionClone;
     },
     async jwt({ token, user }) {

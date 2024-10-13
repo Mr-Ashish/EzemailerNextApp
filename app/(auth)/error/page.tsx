@@ -4,9 +4,9 @@ import Link from 'next/link';
 
 export default function AuthError() {
   const router = useRouter();
-  const { error } = router.query;
+  // const { error } = router.query;
 
-  const getErrorMessage = (error) => {
+  const getErrorMessage = (error: any) => {
     switch (error) {
       case 'CredentialsSignin':
         return 'Invalid email or password.';
@@ -23,7 +23,7 @@ export default function AuthError() {
         <h1 className="mb-4 text-2xl font-bold text-gray-800">
           Authentication Error
         </h1>
-        <p className="mb-4 text-gray-600">{getErrorMessage(error)}</p>
+        <p className="mb-4 text-gray-600">{getErrorMessage('error')}</p>
         <Link href="/login">
           <a className="text-blue-600 hover:underline">Go back to login</a>
         </Link>

@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useSubscription } from '@/app/lib/subscriptionContext';
+import { isValid } from 'zod';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
@@ -35,7 +36,8 @@ export default function NavLinks() {
       name: 'Template Validator',
       href: '/dashboard/validator',
       icon: DocumentDuplicateIcon,
-      isValid: !!subscription?.length,
+      // isValid: !!subscription?.length,
+      isValid: true,
     },
   ];
 

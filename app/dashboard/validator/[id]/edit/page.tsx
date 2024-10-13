@@ -4,25 +4,35 @@ import FileUpload from '@/components/ui/Validator/FileUpload';
 import PreviewComponent from '@/components/ui/Validator/PreviewComponent';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button'; // Importing Shadcn Button component
-import { ArrowLeft, ArrowRight, Clipboard, Download } from 'lucide-react'; // Importing icons
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight, Clipboard, Download, Lock } from 'lucide-react';
 
-import { getTemplateByIdAction, updateTemplateAction } from '@/app/lib/actions'; // Import server actions
+import { getTemplateByIdAction, updateTemplateAction } from '@/app/lib/actions';
+import { useSubscription } from '@/app/lib/subscriptionContext';
+
+// Import Tooltip components
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export default function EmailValidator() {
-  const [sanitizedData, setSanitizedData] = useState<any>(null); // Holds the data after upload
+  const [sanitizedData, setSanitizedData] = useState<any>(null);
   const [previewMode, setPreviewMode] = useState<'original' | 'transformed'>(
     'original'
-  ); // State to manage preview mode
+  );
   const pathname = usePathname();
   const router = useRouter();
   const [templateId, setTemplateId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // Loading state to handle the template loading
+  const [loading, setLoading] = useState(true);
+  const subscription = useSubscription();
 
   // Extract the ID from the pathname
   useEffect(() => {
     const parts = pathname?.split('/');
-    const id = parts?.[3] || null; // Assuming the id is at this position
+    const id = parts?.[3] || null;
     setTemplateId(id);
   }, [pathname]);
 
@@ -31,9 +41,9 @@ export default function EmailValidator() {
     const fetchTemplate = async () => {
       if (templateId) {
         try {
-          const result = await getTemplateByIdAction(templateId); // Call the server-side action to get the template
+          const result = await getTemplateByIdAction(templateId);
           if (result.success && result.template && result.template.content) {
-            setSanitizedData(JSON.parse(result.template.content)); // Assuming the content is in JSON format
+            setSanitizedData(JSON.parse(result.template.content));
           }
         } catch (error) {
           console.error('Failed to fetch template:', error);
@@ -52,9 +62,8 @@ export default function EmailValidator() {
     async (content: string) => {
       if (!templateId || !content) return;
 
-      const result = await updateTemplateAction(templateId, content); // Calls server action
-      if (result.success) {
-      } else {
+      const result = await updateTemplateAction(templateId, content);
+      if (!result.success) {
         console.error('Failed to update template:', result.error);
       }
     },
@@ -72,7 +81,6 @@ export default function EmailValidator() {
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    alert('Code copied to clipboard');
   };
 
   const handleDownloadFile = (filename: string, content: string) => {
@@ -80,17 +88,24 @@ export default function EmailValidator() {
     const file = new Blob([content], { type: 'text/html' });
     element.href = URL.createObjectURL(file);
     element.download = filename;
-    document.body.appendChild(element); // Required for this to work in FireFox
+    document.body.appendChild(element);
     element.click();
   };
 
   const handleLiveEdit = () => {
-    router.push(`/dashboard/validator/${templateId}/liveedit`); // Navigate to live edit route
+    router.push(`/dashboard/validator/${templateId}/liveedit`);
   };
+
+  const hasSubscription = subscription?.length > 0;
 
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  // Function to handle when a subscription is required
+  const handleSubscriptionRequired = () => {
+    router.push('/dashboard'); // Redirect to pricing or subscription page
+  };
 
   return (
     <div className="flex h-full w-full items-center justify-center">
@@ -175,61 +190,145 @@ export default function EmailValidator() {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-4 flex space-x-4">
-              <Button
-                variant="outline"
-                onClick={() =>
-                  handleCopyCode(
-                    previewMode === 'original'
-                      ? sanitizedData?.sanitizedOriginal
-                      : sanitizedData?.transformedHtml
-                  )
-                }
-              >
-                <Clipboard className="mr-2 h-4 w-4" />
-                Copy Code
-              </Button>
+            <TooltipProvider>
+              <div className="mt-4 flex flex-wrap gap-4">
+                {/* Copy Code Button */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (hasSubscription) {
+                          handleCopyCode(
+                            previewMode === 'original'
+                              ? sanitizedData?.sanitizedOriginal
+                              : sanitizedData?.transformedHtml
+                          );
+                        } else {
+                          handleSubscriptionRequired();
+                        }
+                      }}
+                      className="flex items-center"
+                    >
+                      <Clipboard className="mr-2 h-4 w-4" />
+                      Copy Code
+                      {!hasSubscription && <Lock className="ml-2 h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  {!hasSubscription && (
+                    <TooltipContent>
+                      <p>Subscribe to access this feature</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
 
-              <Button
-                variant="outline"
-                onClick={() =>
-                  handleDownloadFile(
-                    'minified.html',
-                    previewMode === 'original'
-                      ? sanitizedData?.sanitizedOriginal
-                      : sanitizedData?.transformedHtml
-                  )
-                }
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download Minified
-              </Button>
+                {/* Download Minified Button */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (hasSubscription) {
+                          handleDownloadFile(
+                            'minified.html',
+                            previewMode === 'original'
+                              ? sanitizedData?.sanitizedOriginal
+                              : sanitizedData?.transformedHtml
+                          );
+                        } else {
+                          handleSubscriptionRequired();
+                        }
+                      }}
+                      className="flex items-center"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Minified
+                      {!hasSubscription && <Lock className="ml-2 h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  {!hasSubscription && (
+                    <TooltipContent>
+                      <p>Subscribe to access this feature</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
 
-              <Button
-                variant="outline"
-                onClick={() =>
-                  handleDownloadFile(
-                    'original.html',
-                    previewMode === 'original'
-                      ? sanitizedData?.sanitizedOriginal
-                      : sanitizedData?.transformedHtml
-                  )
-                }
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download Original
-              </Button>
-            </div>
+                {/* Download Original Button */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (hasSubscription) {
+                          handleDownloadFile(
+                            'original.html',
+                            previewMode === 'original'
+                              ? sanitizedData?.sanitizedOriginal
+                              : sanitizedData?.transformedHtml
+                          );
+                        } else {
+                          handleSubscriptionRequired();
+                        }
+                      }}
+                      className="flex items-center"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Original
+                      {!hasSubscription && <Lock className="ml-2 h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  {!hasSubscription && (
+                    <TooltipContent>
+                      <p>Subscribe to access this feature</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </div>
+            </TooltipProvider>
 
             {/* Live Edit Button for Transformed HTML */}
             {previewMode === 'transformed' && (
-              <Button
-                className="mt-4"
-                variant="default"
-                onClick={handleLiveEdit}
-              >
-                Live Edit Transformed HTML
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      className="mt-4 flex items-center"
+                      variant="default"
+                      onClick={() => {
+                        if (hasSubscription) {
+                          handleLiveEdit();
+                        } else {
+                          handleSubscriptionRequired();
+                        }
+                      }}
+                    >
+                      Live Edit Transformed HTML
+                      {!hasSubscription && <Lock className="ml-2 h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  {!hasSubscription && (
+                    <TooltipContent>
+                      <p>Subscribe to access this feature</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+            {/* Message about subscription */}
+            {!hasSubscription && (
+              <div className="mt-6 rounded-lg bg-yellow-100 p-4">
+                <p className="text-yellow-800">
+                  Some features are locked. Please{' '}
+                  <span
+                    className="cursor-pointer font-semibold text-yellow-900 underline"
+                    onClick={handleSubscriptionRequired}
+                  >
+                    subscribe
+                  </span>{' '}
+                  to access all features.
+                </p>
+              </div>
             )}
           </div>
         </div>

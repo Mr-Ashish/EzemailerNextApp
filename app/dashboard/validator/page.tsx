@@ -20,11 +20,12 @@ import { Trash2, Pencil, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateTemplateDialog from '@/components/ui/Validator/CreateTemplateDialog';
 import { useRouter } from 'next/navigation';
+import { useSubscription } from '@/app/lib/subscriptionContext';
 
 const ValidatorDashboard = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-
+  const subscription = useSubscription();
   const [templates, setTemplates] = useState<EmailTemplateType[]>([]);
   const [message, setMessage] = useState('');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);

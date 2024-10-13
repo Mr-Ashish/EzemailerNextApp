@@ -30,7 +30,7 @@ const PaymentButton = ({
     setIsLoading(true);
     const res = await loadRazorpayScript();
     if (!res) {
-      alert('Razorpay SDK failed to load. Are you online?');
+      // alert('Razorpay SDK failed to load. Are you online?');
       setIsLoading(false);
       return;
     }

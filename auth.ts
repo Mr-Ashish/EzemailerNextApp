@@ -9,12 +9,12 @@ import authConfig from './auth.config';
 const prisma = new PrismaClient();
 
 const isVerificationEmailDisabled =
-  process.env.DISABLE_VERIFICATION_EMAIL === 'true';
+  process.env.DISABLE_EMAIL_VERIFICATION === 'true';
 
 async function getUser(email: string): Promise<User | null> {
   try {
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email, active: true },
     });
 
     return user;
@@ -47,7 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const { email, password } = parsedCredentials.data;
           const user = await getUser(email);
 
-          if (!user || !user.password) {
+          if (!user || !user.password || !user.active) {
             return null;
           }
           const isValid = await bcrypt.compare(password, user.password);
