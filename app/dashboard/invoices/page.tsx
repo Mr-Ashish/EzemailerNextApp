@@ -9,10 +9,6 @@ import { fetchInvoicesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
 // import PaymentButton from '@/components/ui/paymentButton';
 
-export const metadata: Metadata = {
-  title: 'Invoices',
-};
-
 export default async function Page({
   searchParams,
 }: {

@@ -10,7 +10,6 @@ import { ArrowLeft, ArrowRight, Clipboard, Download, Lock } from 'lucide-react';
 import { getTemplateByIdAction, updateTemplateAction } from '@/app/lib/actions';
 import { useSubscription } from '@/app/lib/subscriptionContext';
 
-// Import Tooltip components
 import {
   Tooltip,
   TooltipContent,
@@ -18,6 +17,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import ErrorDisplay from '@/components/ui/Validator/TemplateErrors';
+import { set } from 'zod';
+import ErrorBoundary from '@/components/ui/ErrorBoundry';
 
 export default function EmailValidator() {
   const [sanitizedData, setSanitizedData] = useState<any>(null);
@@ -27,13 +28,16 @@ export default function EmailValidator() {
   const pathname = usePathname();
   const router = useRouter();
   const [templateId, setTemplateId] = useState<string | null>(null);
+  const [templateMeta, setTemplateMeta] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const subscription = useSubscription();
 
   // Extract the ID from the pathname
   useEffect(() => {
+    console.log('-------here Pathname:', pathname);
     const parts = pathname?.split('/');
     const id = parts?.[3] || null;
+    console.log('-------here ID:', id);
     setTemplateId(id);
   }, [pathname]);
 
@@ -43,7 +47,13 @@ export default function EmailValidator() {
       if (templateId) {
         try {
           const result = await getTemplateByIdAction(templateId);
+          console.log('-------here Result:', result);
+          if (result.success && result.template) {
+            setTemplateMeta(result.template);
+          }
+
           if (result.success && result.template && result.template.content) {
+            console.log('-------here Template:', result.template);
             setSanitizedData(JSON.parse(result.template.content));
           }
         } catch (error) {
@@ -55,7 +65,7 @@ export default function EmailValidator() {
         setLoading(false);
       }
     };
-
+    console.log('-------here TemplateID:', templateId);
     fetchTemplate();
   }, [templateId]);
 
@@ -112,20 +122,35 @@ export default function EmailValidator() {
     <div className="flex h-full w-full items-center justify-center">
       {!sanitizedData ? (
         // Show only FileUpload component in the center of the screen before the file is uploaded
-        <div className="flex h-screen w-full flex-col items-center justify-center align-middle">
-          <div className="text-xl font-semibold">
-            Start by uploading your html template{' '}
-          </div>
-          <div className="flex w-full max-w-md justify-center">
-            <FileUpload
-              onUploadSuccess={handleFileUploadSuccess}
-              isEditView={false}
-            />
+        <div className="relative flex h-screen w-full flex-col items-center justify-center bg-gray-50">
+          {/* Background View */}
+          {/* <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="text-2xl font-bold text-gray-300">
+              Click the button below to upload your HTML template
+            </div>
+          </div> */}
+
+          {/* Overlay */}
+          <div className="z-10 flex w-full max-w-md flex-col items-center justify-center space-y-4 bg-white p-8 shadow-lg">
+            {/* Title and Description */}
+            <h1 className="text-3xl font-semibold text-gray-800">
+              {templateMeta?.name}
+            </h1>
+            <p className="text-center text-sm text-gray-600">
+              Start by uploading your HTML template to transform and validate it
+              for email compatibility.
+            </p>
+            <div>
+              <FileUpload
+                onUploadSuccess={handleFileUploadSuccess}
+                isEditView={false}
+              />
+            </div>
           </div>
         </div>
       ) : (
         // Show the sectional view once the file is uploaded
-        <div className="flex h-full w-full flex-col space-y-4 md:flex-row md:space-y-0">
+        <div className="flex h-full w-full flex-col md:flex-row">
           {/* Left Section */}
           <div className="flex w-full flex-col space-y-6 border-r p-4 md:w-1/3">
             <Button
@@ -170,13 +195,15 @@ export default function EmailValidator() {
 
             {/* Preview Area */}
             <div className="rounded-lg border bg-gray-50 p-4">
-              <PreviewComponent
-                htmlContent={
-                  previewMode === 'original'
-                    ? sanitizedData?.sanitizedOriginal
-                    : sanitizedData?.transformedHtml
-                }
-              />
+              <ErrorBoundary>
+                <PreviewComponent
+                  htmlContent={
+                    previewMode === 'original'
+                      ? sanitizedData?.sanitizedOriginal
+                      : sanitizedData?.transformedHtml
+                  }
+                />
+              </ErrorBoundary>
             </div>
 
             {/* Action Buttons */}
