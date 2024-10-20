@@ -26,8 +26,8 @@ class ErrorBoundary extends React.Component {
             Something went wrong.
           </h1>
           <p className="mt-2 text-center text-gray-600">
-            We're sorry for the inconvenience. Please try refreshing the page or
-            contact support if the problem persists.
+            We&apos;re sorry for the inconvenience. Please try refreshing the
+            page or contact support if the problem persists.
           </p>
           <button
             onClick={() => window.location.reload()}
