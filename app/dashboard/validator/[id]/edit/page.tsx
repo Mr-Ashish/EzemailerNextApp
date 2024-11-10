@@ -34,10 +34,8 @@ export default function EmailValidator() {
 
   // Extract the ID from the pathname
   useEffect(() => {
-    console.log('-------here Pathname:', pathname);
     const parts = pathname?.split('/');
     const id = parts?.[3] || null;
-    console.log('-------here ID:', id);
     setTemplateId(id);
   }, [pathname]);
 
@@ -47,13 +45,11 @@ export default function EmailValidator() {
       if (templateId) {
         try {
           const result = await getTemplateByIdAction(templateId);
-          console.log('-------here Result:', result);
           if (result.success && result.template) {
             setTemplateMeta(result.template);
           }
 
           if (result.success && result.template && result.template.content) {
-            console.log('-------here Template:', result.template);
             setSanitizedData(JSON.parse(result.template.content));
           }
         } catch (error) {
@@ -65,7 +61,6 @@ export default function EmailValidator() {
         setLoading(false);
       }
     };
-    console.log('-------here TemplateID:', templateId);
     fetchTemplate();
   }, [templateId]);
 
